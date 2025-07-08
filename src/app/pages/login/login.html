@@ -1,0 +1,9 @@
+<main class="content">
+  <h2>Login</h2>
+  <form (ngSubmit)="onLogin()">
+    <input type="text" [(ngModel)]="username" name="username" placeholder="Usuario" required />
+    <input type="password" [(ngModel)]="password" name="password" placeholder="Contraseña" required />
+    <button type="submit">Entrar</button>
+  </form>
+  <p *ngIf="error" style="color: red;">Usuario o contraseña incorrectos</p>
+</main>
