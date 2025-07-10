@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Header } from './header';
+import { ProductoDialogo } from './producto-dialogo';
 
-describe('Header', () => {
-  let component: Header;
-  let fixture: ComponentFixture<Header>;
+describe('ProductoDialogo', () => {
+  let component: ProductoDialogo;
+  let fixture: ComponentFixture<ProductoDialogo>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Header]
+      imports: [ProductoDialogo]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Header);
+    fixture = TestBed.createComponent(ProductoDialogo);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

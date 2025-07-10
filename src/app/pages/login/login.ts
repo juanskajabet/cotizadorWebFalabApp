@@ -19,10 +19,15 @@ export class Login {
   constructor(private auth: Auth, private router: Router) { }
 
   onLogin() {
-    if (this.auth.login(this.username, this.password)) {
-      this.router.navigate(['/index']);
-    } else {
-      this.error = true;
-    }
+  if (this.auth.login(this.username, this.password)) {
+    this.error = false;
+    this.router.navigate(['/index']);
+  } else {
+    this.error = true;
+    setTimeout(() => {
+      this.error = false;
+    }, 3000);
   }
+}
+
 }

@@ -1,7 +1,41 @@
-<nav class="sidebar">
-  <ul>
-    <li><a (click)="irInicio()">Inicio</a></li>
-    <li><a (click)="irReportes()">Reportes</a></li>
-    <li><a href="#">Configuración</a></li>
+<!-- Botón fijo para abrir/cerrar -->
+<button class="btn btn-primary m-2 toggle-btn" (click)="toggleSidebar()">
+  <i class="bi" [ngClass]="sidebarOpen ? 'bi-chevron-left' : 'bi-list'"></i>
+</button>
+
+<!-- Sidebar -->
+<div [ngClass]="{'active': sidebarOpen, 'collapsed': !sidebarOpen}" class="sidebar">
+  <ul class="list-unstyled ps-0">
+    <li>
+      <a routerLink="/inicio" class="nav-link">
+        <i class="bi bi-house-door-fill"></i>
+        <span class="link-text">Inicio</span>
+      </a>
+    </li>
+    <li>
+      <a routerLink="/productos" class="nav-link">
+        <i class="bi bi-box-seam"></i>
+        <span class="link-text">Stock de productos</span>
+      </a>
+    </li>
+    <li>
+      <a routerLink="/costos" class="nav-link">
+        <i class="bi bi-currency-dollar"></i>
+        <span class="link-text">Costos y tiempos</span>
+      </a>
+    </li>
+    <li>
+      <a routerLink="/cotizacion" class="nav-link">
+        <i class="bi bi-receipt"></i>
+        <span class="link-text">Cotización</span>
+      </a>
+    </li>
   </ul>
-</nav>
+
+  <div class="p-3 mt-auto">
+    <a (click)="cerrarSesion()" class="nav-link text-danger">
+      <i class="bi bi-box-arrow-right"></i>
+      <span class="link-text">Cerrar sesión</span>
+    </a>
+  </div>
+</div>

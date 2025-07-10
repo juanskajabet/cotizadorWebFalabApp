@@ -1,0 +1,130 @@
+<form>
+  <!-- Información del Producto -->
+  <h6 class="fw-bold mt-3">Información del Producto</h6>
+  <div class="row g-3 mb-3">
+    <div class="col-md-4">
+      <label class="form-label">Código del Producto</label>
+      <select class="form-select">
+        <option selected>Seleccione</option>
+        <option>COD-1</option>
+        <option>COD-2</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Máquina</label>
+      <select class="form-select">
+        <option selected>Seleccione</option>
+        <option>Laser</option>
+        <option>Sublimadora</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Material</label>
+      <select class="form-select">
+        <option selected>Seleccione</option>
+        <option>Material 1</option>
+        <option>Material 2</option>
+      </select>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Descripción del Producto</label>
+      <input type="text" class="form-control" />
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Fecha de Ingreso del Material</label>
+      <input type="date" class="form-control" />
+    </div>
+  </div>
+
+  <!-- Parámetros Dimensiones -->
+  <h6 class="fw-bold mt-3">Parámetros Dimensiones</h6>
+  <div class="row g-3 mb-3">
+    <div class="col-md-4">
+      <label class="form-label">Altura</label>
+      <div class="input-group">
+        <input type="number" class="form-control" />
+        <span class="input-group-text">cm</span>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Ancho</label>
+      <div class="input-group">
+        <input type="number" class="form-control" />
+        <span class="input-group-text">cm</span>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Profundidad</label>
+      <div class="input-group">
+        <input type="number" class="form-control" />
+        <span class="input-group-text">cm</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parámetros Tiempos -->
+  <h6 class="fw-bold mt-3">Parámetros Tiempos</h6>
+  <div class="row g-3 mb-3">
+    <div class="col-md-3">
+      <label class="form-label">Horas</label>
+      <input type="number" class="form-control" />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Minutos</label>
+      <input type="number" class="form-control" />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Post Procesamiento</label>
+      <input type="number" class="form-control" />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Total</label>
+      <input type="number" class="form-control" />
+    </div>
+  </div>
+
+  <!-- Parámetros Material -->
+  <h6 class="fw-bold mt-3">Parámetros Material</h6>
+  <div class="row g-3 mb-3">
+    <div class="col-md-4">
+      <label class="form-label">Cantidad</label>
+      <input type="number" class="form-control" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Costo</label>
+      <div class="input-group">
+        <span class="input-group-text">$</span>
+        <input type="number" class="form-control" />
+      </div>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Costo Sublimación</label>
+      <div class="input-group">
+        <span class="input-group-text">$</span>
+        <input type="number" class="form-control" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Información Facturación -->
+  <h6 class="fw-bold mt-3">Información Facturación</h6>
+  <div class="row g-3 mb-3">
+    <div class="col-md-4">
+      <label class="form-label">Precio</label>
+      <div class="input-group">
+        <span class="input-group-text">$</span>
+        <input type="number" class="form-control" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones -->
+  <div class="d-flex justify-content-end mt-4">
+    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
+      Atrás
+    </button>
+    <button type="button" class="btn btn-primary">
+      Guardar
+    </button>
+  </div>
+</form>

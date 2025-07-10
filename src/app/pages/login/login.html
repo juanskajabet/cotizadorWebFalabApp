@@ -1,9 +1,40 @@
-<main class="content">
-  <h2>Login</h2>
-  <form (ngSubmit)="onLogin()">
-    <input type="text" [(ngModel)]="username" name="username" placeholder="Usuario" required />
-    <input type="password" [(ngModel)]="password" name="password" placeholder="Contraseña" required />
-    <button type="submit">Entrar</button>
-  </form>
-  <p *ngIf="error" style="color: red;">Usuario o contraseña incorrectos</p>
-</main>
+<div class="login-wrapper">
+  <div class="login-container">
+    <!-- Lado izquierdo con imagen -->
+    <div class="login-image">
+      <img src="assets/login-illustration.svg" alt="Imagen de inicio de sesión" />
+    </div>
+
+    <!-- Lado derecho con formulario -->
+    <div class="login-form">
+      <h2>Iniciar sesión</h2>
+
+      <div *ngIf="error" class="alert alert-warning d-flex align-items-center" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Usuario o contraseña incorrectos.
+      </div>
+      <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+        <!-- Usuario -->
+        <div class="form-group">
+          <label for="username">
+            <i class="bi bi-person-fill"></i> Usuario
+          </label>
+          <input type="text" id="username" class="form-control" name="username" [(ngModel)]="username" required />
+        </div>
+
+        <!-- Contraseña -->
+        <div class="form-group">
+          <label for="password">
+            <i class="bi bi-lock-fill"></i> Contraseña
+          </label>
+          <input type="password" id="password" class="form-control" name="password" [(ngModel)]="password" required />
+        </div>
+
+        <!-- Botón -->
+        <button type="submit" class="btn btn-primary w-100 mt-2">
+          <i class="bi bi-box-arrow-in-right"></i> Iniciar sesión
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

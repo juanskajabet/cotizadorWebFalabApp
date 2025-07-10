@@ -1,23 +1,21 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
-import { Sidebar } from './sidebar';
+@Component({
+  selector: 'app-sidebar',
+  templateUrl: './sidebar.component.html',
+  styleUrls: ['./sidebar.component.css']
+})
+export class SidebarComponent {
+  sidebarOpen = true;
 
-describe('Sidebar', () => {
-  let component: Sidebar;
-  let fixture: ComponentFixture<Sidebar>;
+  constructor(private router: Router) {}
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [Sidebar]
-    })
-    .compileComponents();
+  toggleSidebar() {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
 
-    fixture = TestBed.createComponent(Sidebar);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+  cerrarSesion() {
+    this.router.navigate(['/login']);
+  }
+}

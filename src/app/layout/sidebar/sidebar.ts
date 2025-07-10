@@ -1,28 +1,27 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'app-sidebar',
-  imports: [],
+  imports: [CommonModule,RouterModule],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css'
 })
 export class Sidebar {
-
+  
+  sidebarOpen = true;
   constructor(
     private router: Router,
   ) {
   }
-
-
-  irReportes() {
-    this.router.navigate(['reporte']);
+  toggleSidebar() {
+    this.sidebarOpen = !this.sidebarOpen;
   }
-
-  irInicio() {
-    this.router.navigate(['index']);
+  cerrarSesion() {
+    this.router.navigate(['/login']);
   }
-
 
 }

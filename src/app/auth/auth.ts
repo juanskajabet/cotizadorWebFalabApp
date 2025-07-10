@@ -8,13 +8,13 @@ export class Auth {
   private isLoggedIn = false;
 
   login(username: string, password: string): boolean {
-    // Login quemado
-    if (username === 'admin' && password === '1234') {
-      this.isLoggedIn = true;
-      return true;
-    }
-    return false;
+  if (username.trim() === 'a' && password.trim() === '1') {
+    this.isLoggedIn = true;
+    return true;
   }
+  return false;
+}
+
 
   logout() {
     this.isLoggedIn = false;

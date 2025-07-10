@@ -1,0 +1,136 @@
+<div class="productos-container">
+  <div class="container my-4">
+    <h2 class="mb-4">Stock de Productos</h2>
+
+    <!-- Filtros y Botón -->
+    <div class="row g-3 align-items-end">
+      <div class="col-md-3">
+        <label for="tipoMaquina" class="form-label">Tipo de Máquina</label>
+        <select id="tipoMaquina" class="form-select" [(ngModel)]="selectedMachine" (change)="filterByMachine()">
+          <option value="">Seleccione un tipo de máquina</option>
+          <option *ngFor="let maquina of maquinas" [value]="maquina">{{ maquina }}</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label for="buscarResultados" class="form-label">Buscar en resultados</label>
+        <div class="input-group">
+          <input
+            id="buscarResultados"
+            type="text"
+            class="form-control"
+            placeholder="Buscar"
+            [(ngModel)]="searchTerm"
+            (input)="filterBySearch()" />
+          <span class="input-group-text">
+            <i class="bi bi-search"></i>
+          </span>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label invisible">Agregar</label>
+        <button
+          type="button"
+          class="btn btn-primary w-100"
+          data-bs-toggle="modal"
+          data-bs-target="#modalAgregarProducto">
+          <i class="bi bi-plus-circle"></i> Agregar Producto
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-responsive mt-4">
+      <table class="table table-bordered align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Código</th>
+            <th>Máquina</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Tiempo Unitario</th>
+            <th>Tiempo Total</th>
+            <th>Precio Unitario</th>
+            <th>Precio Total</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of paginatedData">
+            <td>{{ item.codigo }}</td>
+            <td>{{ item.maquina }}</td>
+            <td>{{ item.producto }}</td>
+            <td>{{ item.cantidad }}</td>
+            <td>{{ item.tiempoUnitario }}</td>
+            <td>{{ item.tiempoTotal }}</td>
+            <td>{{ item.precioUnitario | currency }}</td>
+            <td>{{ item.precioTotal | currency }}</td>
+            <td>
+              <button class="btn btn-sm btn-secondary">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-sm btn-danger ms-1">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="paginatedData.length === 0">
+            <td colspan="9" class="text-center">No hay resultados.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <nav *ngIf="totalPages > 1">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <button class="page-link" (click)="goToPage(currentPage - 1)">
+            &laquo;
+          </button>
+        </li>
+        <li
+          class="page-item"
+          *ngFor="let page of pages"
+          [class.active]="page === currentPage">
+          <button class="page-link" (click)="goToPage(page)">
+            {{ page }}
+          </button>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <button class="page-link" (click)="goToPage(currentPage + 1)">
+            &raquo;
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<!-- Modal para agregar producto -->
+<div
+  class="modal fade"
+  id="modalAgregarProducto"
+  tabindex="-1"
+  aria-labelledby="modalAgregarProductoLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalAgregarProductoLabel">
+          <i class="bi bi-plus-circle"></i> Agregar Producto
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Aquí se carga tu componente -->
+        <app-producto-dialogo></app-producto-dialogo>
+      </div>
+    </div>
+  </div>
+</div>

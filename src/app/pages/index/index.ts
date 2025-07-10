@@ -2,14 +2,11 @@ import { Component } from '@angular/core';
 import { Auth } from '../../auth/auth';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Header } from '../../layout/header/header';
-import { Sidebar } from '../../layout/sidebar/sidebar';
-import { Content } from '../../layout/content/content';
 
 @Component({
   standalone: true,
   selector: 'app-index',
-  imports: [CommonModule, Header, Sidebar, Content],
+  imports: [CommonModule],
   templateUrl: './index.html',
   styleUrl: './index.css'
 })

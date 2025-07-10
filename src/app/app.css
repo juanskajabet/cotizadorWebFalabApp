@@ -1,11 +1,23 @@
 .layout {
-  display: flex;
-  flex-direction: column;
+  width: 100%;
   height: 100vh;
 }
 
-.body-container {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
+/* Sidebar contenedor */
+.sidebar-container {
+  transition: width 0.3s ease;
+  width: 220px; /* ancho expandido */
+}
+
+/* Sidebar colapsado */
+.sidebar-container.collapsed {
+  width: 60px;
+}
+
+/* Contenido que se adapta */
+.content-container {
+  padding: 20px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  width: 100%;
 }
