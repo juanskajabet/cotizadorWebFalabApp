@@ -1,0 +1,15 @@
+/* Este contenedor hace que tu contenido se mueva a la derecha */
+.productos-container {
+  /* Este padding simula el espacio que deja el sidebar expandido */
+  padding-left: 200px; /* Ancho del sidebar expandido */
+  transition: padding-left 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Si el sidebar está colapsado, reduce el espacio */
+.sidebar.collapsed + .body-container .productos-container {
+  padding-left: 60px; /* Ancho del sidebar colapsado */
+}
+
+

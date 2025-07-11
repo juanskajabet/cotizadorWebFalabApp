@@ -1,0 +1,87 @@
+<form>
+  <!-- Título principal -->
+  <h4 class="fw-bold text-center mb-4">
+    Configuración Costos y Tiempo
+  </h4>
+
+  <!-- Información de Costos -->
+  <h6 class="fw-bold mt-3">Información de Costos</h6>
+  <div class="row g-3 mb-3">
+    <div class="col-md-6">
+      <label class="form-label">Código del Producto</label>
+      <select class="form-select">
+        <option selected>Seleccione</option>
+        <option>COD-1</option>
+        <option>COD-2</option>
+        <option>COD-3</option>
+      </select>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Descripción del Producto</label>
+      <input type="text" class="form-control" />
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Costo por Kg.</label>
+      <div class="input-group">
+        <span class="input-group-text">$</span>
+        <input type="number" class="form-control" />
+      </div>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Costo por g.</label>
+      <div class="input-group">
+        <span class="input-group-text">$</span>
+        <input type="number" class="form-control" />
+      </div>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Costo por M2.</label>
+      <div class="input-group">
+        <span class="input-group-text">$</span>
+        <input type="number" class="form-control" />
+      </div>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Costo por A4</label>
+      <div class="input-group">
+        <span class="input-group-text">$</span>
+        <input type="number" class="form-control" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Información de Alquiler -->
+  <h6 class="fw-bold mt-3">Información de Alquiler</h6>
+  <div class="row g-3 mb-3">
+    <div class="col-md-6">
+      <label class="form-label">Alquiler H</label>
+      <input type="number" class="form-control" />
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Alquiler M</label>
+      <input type="number" class="form-control" />
+    </div>
+  </div>
+
+  <!-- Información Facturación -->
+  <h6 class="fw-bold mt-3">Información Facturación</h6>
+  <div class="row g-3 mb-3">
+    <div class="col-md-6">
+      <label class="form-label">Tiempo Post Procesamiento</label>
+      <input type="number" class="form-control" />
+    </div>
+  </div>
+
+  <!-- Botones -->
+  <div class="d-flex justify-content-end mt-4">
+    <button
+      type="button"
+      class="btn btn-secondary me-2"
+      data-bs-dismiss="modal">
+      Atrás
+    </button>
+    <button type="button" class="btn btn-primary">
+      Guardar
+    </button>
+  </div>
+</form>
