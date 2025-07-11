@@ -4,35 +4,30 @@
   <div class="row g-3 mb-3">
     <div class="col-md-4">
       <label class="form-label">Código del Producto</label>
-      <select class="form-select">
-        <option selected>Seleccione</option>
-        <option>COD-1</option>
-        <option>COD-2</option>
-      </select>
+      <input 
+        type="text" 
+        class="form-control"
+        [value]="producto?.codigo"
+        readonly
+      />
     </div>
     <div class="col-md-4">
       <label class="form-label">Máquina</label>
-      <select class="form-select">
-        <option selected>Seleccione</option>
-        <option>Laser</option>
-        <option>Sublimadora</option>
-      </select>
+      <input
+        type="text"
+        class="form-control"
+        [value]="producto?.maquina"
+        readonly
+      />
     </div>
     <div class="col-md-4">
-      <label class="form-label">Material</label>
-      <select class="form-select">
-        <option selected>Seleccione</option>
-        <option>Material 1</option>
-        <option>Material 2</option>
-      </select>
-    </div>
-    <div class="col-md-6">
       <label class="form-label">Descripción del Producto</label>
-      <input type="text" class="form-control" />
-    </div>
-    <div class="col-md-6">
-      <label class="form-label">Fecha de Ingreso del Material</label>
-      <input type="date" class="form-control" />
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="producto.producto"
+        name="descripcion"
+      />
     </div>
   </div>
 
@@ -42,21 +37,36 @@
     <div class="col-md-4">
       <label class="form-label">Altura</label>
       <div class="input-group">
-        <input type="number" class="form-control" />
+        <input
+          type="number"
+          class="form-control"
+          [(ngModel)]="producto.altura"
+          name="altura"
+        />
         <span class="input-group-text">cm</span>
       </div>
     </div>
     <div class="col-md-4">
       <label class="form-label">Ancho</label>
       <div class="input-group">
-        <input type="number" class="form-control" />
+        <input
+          type="number"
+          class="form-control"
+          [(ngModel)]="producto.ancho"
+          name="ancho"
+        />
         <span class="input-group-text">cm</span>
       </div>
     </div>
     <div class="col-md-4">
       <label class="form-label">Profundidad</label>
       <div class="input-group">
-        <input type="number" class="form-control" />
+        <input
+          type="number"
+          class="form-control"
+          [(ngModel)]="producto.profundidad"
+          name="profundidad"
+        />
         <span class="input-group-text">cm</span>
       </div>
     </div>
@@ -67,19 +77,39 @@
   <div class="row g-3 mb-3">
     <div class="col-md-3">
       <label class="form-label">Horas</label>
-      <input type="number" class="form-control" />
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="producto.horas"
+        name="horas"
+      />
     </div>
     <div class="col-md-3">
       <label class="form-label">Minutos</label>
-      <input type="number" class="form-control" />
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="producto.minutos"
+        name="minutos"
+      />
     </div>
     <div class="col-md-3">
       <label class="form-label">Post Procesamiento</label>
-      <input type="number" class="form-control" />
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="producto.tiempoPostProceso"
+        name="postProceso"
+      />
     </div>
     <div class="col-md-3">
       <label class="form-label">Total</label>
-      <input type="number" class="form-control" />
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="producto.tiempoTotal"
+        name="tiempoTotal"
+      />
     </div>
   </div>
 
@@ -87,21 +117,36 @@
   <h6 class="fw-bold mt-3">Parámetros Material</h6>
   <div class="row g-3 mb-3">
     <div class="col-md-4">
-      <label class="form-label">Cantidad</label>
-      <input type="number" class="form-control" />
+      <label class="form-label">Cantidad Material</label>
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="producto.cantidadMaterial"
+        name="cantidadMaterial"
+      />
     </div>
     <div class="col-md-4">
-      <label class="form-label">Costo</label>
+      <label class="form-label">Costo Material</label>
       <div class="input-group">
         <span class="input-group-text">$</span>
-        <input type="number" class="form-control" />
+        <input
+          type="number"
+          class="form-control"
+          [(ngModel)]="producto.costoMaterial"
+          name="costoMaterial"
+        />
       </div>
     </div>
     <div class="col-md-4">
       <label class="form-label">Costo Sublimación</label>
       <div class="input-group">
         <span class="input-group-text">$</span>
-        <input type="number" class="form-control" />
+        <input
+          type="number"
+          class="form-control"
+          [(ngModel)]="producto.costoSublimacion"
+          name="costoSublimacion"
+        />
       </div>
     </div>
   </div>
@@ -113,17 +158,27 @@
       <label class="form-label">Precio</label>
       <div class="input-group">
         <span class="input-group-text">$</span>
-        <input type="number" class="form-control" />
+        <input
+          type="number"
+          class="form-control"
+          [(ngModel)]="producto.precio"
+          name="precio"
+        />
       </div>
     </div>
   </div>
 
   <!-- Botones -->
   <div class="d-flex justify-content-end mt-4">
-    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
+    <button
+      type="button"
+      class="btn btn-secondary me-2"
+      data-bs-dismiss="modal">
       Atrás
     </button>
-    <button type="button" class="btn btn-primary">
+    <button
+      type="button"
+      class="btn btn-primary">
       Guardar
     </button>
   </div>

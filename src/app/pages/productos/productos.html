@@ -2,38 +2,39 @@
   <div class="container my-4">
     <h2 class="mb-4">Stock de Productos</h2>
 
-    <!-- Filtros y Botón -->
+    <!-- Filtros -->
     <div class="row g-3 align-items-end">
       <div class="col-md-3">
         <label for="tipoMaquina" class="form-label">Tipo de Máquina</label>
-        <select id="tipoMaquina" class="form-select" [(ngModel)]="selectedMachine" (change)="filterByMachine()">
-          <option value="">Seleccione un tipo de máquina</option>
-          <option *ngFor="let maquina of maquinas" [value]="maquina">{{ maquina }}</option>
+        <select id="tipoMaquina" class="form-select" *ngIf="maquinas.length > 0" [(ngModel)]="selectedMachine"
+          (change)="filterByMachine()">
+          <option [ngValue]="null">Seleccione un tipo de máquina</option>
+          <option *ngFor="let maquina of maquinas" [ngValue]="maquina.IdTipoMaquina">
+            {{ maquina.Nombre }} ({{ maquina.CodigoMaquina }})
+          </option>
         </select>
+
+        <!-- Mientras se carga -->
+        <div *ngIf="maquinas.length === 0">
+          <span class="text-muted">Cargando tipos de máquina...</span>
+        </div>
+
+
       </div>
 
       <div class="col-md-3">
         <label for="buscarResultados" class="form-label">Buscar en resultados</label>
         <div class="input-group">
-          <input
-            id="buscarResultados"
-            type="text"
-            class="form-control"
-            placeholder="Buscar"
-            [(ngModel)]="searchTerm"
-            (input)="filterBySearch()" />
-          <span class="input-group-text">
-            <i class="bi bi-search"></i>
-          </span>
+          <input id="buscarResultados" type="text" class="form-control" placeholder="Buscar" [(ngModel)]="searchTerm" />
+          <button class="btn btn-outline-primary" (click)="onBuscar()">
+            <i class="bi bi-search"></i> Buscar
+          </button>
         </div>
       </div>
 
       <div class="col-md-3">
         <label class="form-label invisible">Agregar</label>
-        <button
-          type="button"
-          class="btn btn-primary w-100"
-          data-bs-toggle="modal"
+        <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal"
           data-bs-target="#modalAgregarProducto">
           <i class="bi bi-plus-circle"></i> Agregar Producto
         </button>
@@ -41,33 +42,44 @@
     </div>
 
     <!-- Tabla -->
-    <div class="table-responsive mt-4">
+    <div class="table-responsive mt-4" *ngIf="paginatedData.length > 0; else sinDatos">
       <table class="table table-bordered align-middle">
         <thead class="table-light">
           <tr>
             <th>Código</th>
-            <th>Máquina</th>
             <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Tiempo Unitario</th>
-            <th>Tiempo Total</th>
-            <th>Precio Unitario</th>
-            <th>Precio Total</th>
+            <th>Altura (cm)</th>
+            <th>Ancho (cm)</th>
+            <th>Profundidad (cm)</th>
+            <th>Producción</th>
+            <th>Post-proceso</th>
+            <th>Total</th>
+            <th>Cant. Material (gr)</th>
+            <th>Costo Material</th>
+            <th>Costo Sublimación</th>
+            <th>Precio</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let item of paginatedData">
             <td>{{ item.codigo }}</td>
-            <td>{{ item.maquina }}</td>
             <td>{{ item.producto }}</td>
-            <td>{{ item.cantidad }}</td>
-            <td>{{ item.tiempoUnitario }}</td>
+            <td>{{ item.altura }}</td>
+            <td>{{ item.ancho }}</td>
+            <td>{{ item.profundidad }}</td>
+            <td>{{ item.tiempoProduccion }}</td>
+            <td>{{ item.tiempoPostProceso }}</td>
             <td>{{ item.tiempoTotal }}</td>
-            <td>{{ item.precioUnitario | currency }}</td>
-            <td>{{ item.precioTotal | currency }}</td>
+            <td>{{ item.cantidadMaterial }}</td>
+            <td>{{ item.costoMaterial | currency }}</td>
             <td>
-              <button class="btn btn-sm btn-secondary">
+              {{ item.costoSublimacion !== null ? (item.costoSublimacion | currency) : '-' }}
+            </td>
+            <td>{{ item.precio | currency }}</td>
+            <td>
+              <button class="btn btn-sm btn-secondary" (click)="seleccionarProducto(item)" data-bs-toggle="modal"
+                data-bs-target="#modalAgregarProducto">
                 <i class="bi bi-pencil"></i>
               </button>
               <button class="btn btn-sm btn-danger ms-1">
@@ -76,44 +88,60 @@
             </td>
           </tr>
           <tr *ngIf="paginatedData.length === 0">
-            <td colspan="9" class="text-center">No hay resultados.</td>
+            <td colspan="13" class="text-center">No hay resultados.</td>
           </tr>
         </tbody>
       </table>
     </div>
+    <ng-template #sinDatos>
+      <div class="text-center my-4">
+        <em>No hay datos para mostrar.</em>
+      </div>
+    </ng-template>
 
-    <!-- Paginación -->
-    <nav *ngIf="totalPages > 1">
-      <ul class="pagination justify-content-center">
-        <li class="page-item" [class.disabled]="currentPage === 1">
-          <button class="page-link" (click)="goToPage(currentPage - 1)">
-            &laquo;
-          </button>
-        </li>
-        <li
-          class="page-item"
-          *ngFor="let page of pages"
-          [class.active]="page === currentPage">
-          <button class="page-link" (click)="goToPage(page)">
-            {{ page }}
-          </button>
-        </li>
-        <li class="page-item" [class.disabled]="currentPage === totalPages">
-          <button class="page-link" (click)="goToPage(currentPage + 1)">
-            &raquo;
-          </button>
-        </li>
-      </ul>
-    </nav>
+    <!-- Paginación y controles inferiores -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3">
+         <!-- Total de registros -->
+      <div class="mb-2 mb-md-0">
+        Total de registros: <strong>{{ totalRegistros }}</strong>
+      </div>
+      <!-- Navegación de páginas -->
+      <nav *ngIf="totalPages > 1">
+        <ul class="pagination mb-0">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link" (click)="goToPage(currentPage - 1)">
+              &laquo;
+            </button>
+          </li>
+          <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
+            <button class="page-link" (click)="goToPage(page)">
+              {{ page }}
+            </button>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <button class="page-link" (click)="goToPage(currentPage + 1)">
+              &raquo;
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Registros por página -->
+      <div class="ms-md-3 mt-2 mt-md-0">
+        <label class="form-label mb-0 me-2">Registros por página:</label>
+        <select class="form-select d-inline-block w-auto" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+          <option [ngValue]="2">2</option>
+          <option [ngValue]="5">5</option>
+          <option [ngValue]="10">10</option>
+          <option [ngValue]="20">20</option>
+        </select>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- Modal para agregar producto -->
-<div
-  class="modal fade"
-  id="modalAgregarProducto"
-  tabindex="-1"
-  aria-labelledby="modalAgregarProductoLabel"
+<div class="modal fade" id="modalAgregarProducto" tabindex="-1" aria-labelledby="modalAgregarProductoLabel"
   aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered">
     <div class="modal-content">
@@ -121,15 +149,10 @@
         <h5 class="modal-title" id="modalAgregarProductoLabel">
           <i class="bi bi-plus-circle"></i> Agregar Producto
         </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Cerrar"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <div class="modal-body">
-        <!-- Aquí se carga tu componente -->
-        <app-producto-dialogo></app-producto-dialogo>
+        <app-producto-dialogo [producto]="productoSeleccionado"></app-producto-dialogo>
       </div>
     </div>
   </div>
