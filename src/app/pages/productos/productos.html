@@ -48,6 +48,7 @@
           <tr>
             <th>Código</th>
             <th>Producto</th>
+            <th>Material</th>
             <th>Altura (cm)</th>
             <th>Ancho (cm)</th>
             <th>Profundidad (cm)</th>
@@ -65,10 +66,11 @@
           <tr *ngFor="let item of paginatedData">
             <td>{{ item.codigo }}</td>
             <td>{{ item.producto }}</td>
+            <td>{{ item.nombreMaterial }}</td>
             <td>{{ item.altura }}</td>
             <td>{{ item.ancho }}</td>
             <td>{{ item.profundidad }}</td>
-            <td>{{ item.tiempoProduccion }}</td>
+            <td>{{ item.horas }}h {{ item.minutos }}m</td>
             <td>{{ item.tiempoPostProceso }}</td>
             <td>{{ item.tiempoTotal }}</td>
             <td>{{ item.cantidadMaterial }}</td>

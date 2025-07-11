@@ -16,11 +16,23 @@
       <input
         type="text"
         class="form-control"
-        [value]="producto?.maquina"
+        [value]="producto?.idMaquina"
         readonly
       />
     </div>
     <div class="col-md-4">
+      <label class="form-label">Material</label>
+      <input
+        type="text"
+        class="form-control"
+        [value]="producto?.idMaterial"
+        readonly
+      />
+    </div>
+    
+  </div>
+<div class="row g-3 mb-12">
+  <div class="col-md-6">
       <label class="form-label">Descripción del Producto</label>
       <input
         type="text"
@@ -29,8 +41,7 @@
         name="descripcion"
       />
     </div>
-  </div>
-
+</div>
   <!-- Parámetros Dimensiones -->
   <h6 class="fw-bold mt-3">Parámetros Dimensiones</h6>
   <div class="row g-3 mb-3">
@@ -40,6 +51,8 @@
         <input
           type="number"
           class="form-control"
+          min="0"
+          step="0.01"
           [(ngModel)]="producto.altura"
           name="altura"
         />
@@ -52,6 +65,8 @@
         <input
           type="number"
           class="form-control"
+          min="0"
+          step="0.01"
           [(ngModel)]="producto.ancho"
           name="ancho"
         />
@@ -64,6 +79,8 @@
         <input
           type="number"
           class="form-control"
+          min="0"
+          step="0.01"
           [(ngModel)]="producto.profundidad"
           name="profundidad"
         />
@@ -80,8 +97,11 @@
       <input
         type="number"
         class="form-control"
+        min="0"
+        step="1"
         [(ngModel)]="producto.horas"
         name="horas"
+        (ngModelChange)="actualizarTiempoTotal()"
       />
     </div>
     <div class="col-md-3">
@@ -89,8 +109,11 @@
       <input
         type="number"
         class="form-control"
+        min="0"
+        step="1"
         [(ngModel)]="producto.minutos"
         name="minutos"
+        (ngModelChange)="actualizarTiempoTotal()"
       />
     </div>
     <div class="col-md-3">
@@ -100,6 +123,7 @@
         class="form-control"
         [(ngModel)]="producto.tiempoPostProceso"
         name="postProceso"
+        readonly
       />
     </div>
     <div class="col-md-3">
@@ -107,8 +131,8 @@
       <input
         type="text"
         class="form-control"
-        [(ngModel)]="producto.tiempoTotal"
-        name="tiempoTotal"
+        [value]="producto.tiempoTotal"
+        readonly
       />
     </div>
   </div>
@@ -121,6 +145,8 @@
       <input
         type="number"
         class="form-control"
+        min="0"
+        step="0.01"
         [(ngModel)]="producto.cantidadMaterial"
         name="cantidadMaterial"
       />
@@ -132,6 +158,8 @@
         <input
           type="number"
           class="form-control"
+          min="0"
+          step="0.01"
           [(ngModel)]="producto.costoMaterial"
           name="costoMaterial"
         />
@@ -144,6 +172,8 @@
         <input
           type="number"
           class="form-control"
+          min="0"
+          step="0.01"
           [(ngModel)]="producto.costoSublimacion"
           name="costoSublimacion"
         />
@@ -161,8 +191,8 @@
         <input
           type="number"
           class="form-control"
-          [(ngModel)]="producto.precio"
-          name="precio"
+          [value]="producto.precio"
+          readonly
         />
       </div>
     </div>

@@ -10,14 +10,20 @@ interface Producto {
   altura: number;
   ancho: number;
   profundidad: number;
-  tiempoProduccion: string;
+  horas: number;
+  minutos: number;
   tiempoPostProceso: string;
   tiempoTotal: string;
   cantidadMaterial: number;
   costoMaterial: number;
   costoSublimacion: number | null;
   precio: number;
+  idTipoMaquina?: number;
+  idMaterial?: number;
+  idProducto?: number;
+  nombreMaterial?: string;
 }
+
 
 interface TipoMaquina {
   IdTipoMaquina: number;
@@ -28,6 +34,8 @@ interface TipoMaquina {
 interface ProductoApi {
   IdProducto: number;
   CodigoProducto: string;
+  IdTipoMaquina: number;
+  IdMaterial: number;
   NombreProducto: string;
   AlturaCm: number;
   AnchoCm: number;
@@ -40,6 +48,7 @@ interface ProductoApi {
   CostoMaterial: number;
   CostoSublimacion: number | null;
   Precio: number;
+  NombreMaterial?: string;
 }
 
 @Component({
@@ -118,14 +127,22 @@ export class Productos {
             altura: p.AlturaCm,
             ancho: p.AnchoCm,
             profundidad: p.ProfundidadCm,
-            tiempoProduccion: `${p.Horas}h ${p.Minutos}m`,
+            horas: p.Horas,
+            minutos: p.Minutos,
             tiempoPostProceso: p.TiempoPostProceso,
             tiempoTotal: p.TiempoTotal,
             cantidadMaterial: p.CantidadMaterialGr,
             costoMaterial: p.CostoMaterial,
             costoSublimacion: p.CostoSublimacion,
-            precio: p.Precio
+            precio: p.Precio,
+            idTipoMaquina: p.IdTipoMaquina,
+            idMaterial: p.IdMaterial,
+            idProducto: p.IdProducto,
+            nombreMaterial: p.NombreMaterial
+            
+
           }));
+
 
           this.paginatedData = this.data;
           this.totalPages = Math.ceil(this.totalRegistros / this.pageSize);
