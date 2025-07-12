@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 
+declare var bootstrap: any;
+
 interface TipoMaquina {
   IdTipoMaquina: number;
   CodigoMaquina: string;
@@ -112,4 +114,79 @@ export class ProductoDialogo {
       this.onMaquinaChange();
     }
   }
+get esFDA(): boolean { return this.producto?.idTipoMaquina === 1; }
+get esSDA(): boolean { return this.producto?.idTipoMaquina === 2; }
+get esLAS(): boolean { return this.producto?.idTipoMaquina === 3; }
+get esSUB(): boolean { return this.producto?.idTipoMaquina === 5; }
+
+guardarProducto() {
+  if (!this.producto?.idTipoMaquina || !this.producto?.idMaterial || !this.producto?.producto) {
+    alert('Por favor, seleccione máquina, material y descripción.');
+    return;
+  }
+
+  const tipo = this.producto.idTipoMaquina;
+
+  const payload = {
+    IdMaterial: this.producto.idMaterial,
+    NombreProducto: this.producto.producto,
+    AlturaCm: (tipo !== 5 ? this.producto.altura : null),
+    AnchoCm: (tipo !== 5 ? this.producto.ancho : null),
+    ProfundidadCm: (tipo === 1 || tipo === 2) ? this.producto.profundidad : null,
+    Horas: (tipo === 5 ? null : this.producto.horas),
+    Minutos: this.producto.minutos,
+    TiempoPostProceso: this.producto.tiempoPostProceso,
+    TiempoTotal: this.convertirTiempoTotal(this.producto.tiempoTotal),
+    CantidadMaterialGr: (tipo !== 5 ? this.producto.cantidadMaterial : null),
+    CostoMaterial: this.producto.costoMaterial,
+    CostoSublimacion: (tipo === 5 ? this.producto.costoSublimacion : null),
+    Precio: 20
+  };
+
+  this.http.post(`${this.apiUrl}/producto/agregar`, payload).subscribe({
+    next: () => {
+      this.mostrarAlertaExito();
+      // Cerrar modal
+      const modalElement = document.getElementById('modalAgregarProducto');
+      if (modalElement) {
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        modal?.hide();
+      }
+    },
+    error: (err) => {
+      console.error('Error al guardar:', err);
+      alert('Ocurrió un error al guardar el producto.');
+    }
+  });
+}
+
+private mostrarAlertaExito() {
+  const alert = document.createElement('div');
+  alert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3';
+  alert.role = 'alert';
+  alert.innerHTML = `
+    <strong>¡Éxito!</strong> Registro ingresado correctamente.
+  `;
+  document.body.appendChild(alert);
+
+  setTimeout(() => {
+    alert.classList.remove('show');
+    alert.classList.add('hide');
+    setTimeout(() => alert.remove(), 300);
+  }, 3000);
+}
+
+private convertirTiempoTotal(texto: string): string {
+  if (!texto) return '00:00:00';
+
+  const partes = texto.match(/(\d+)h\s+(\d+)m/);
+  if (!partes) return '00:00:00';
+
+  const horas = partes[1].padStart(2, '0');
+  const minutos = partes[2].padStart(2, '0');
+  return `${horas}:${minutos}:00`;
+}
+
+
+
 }

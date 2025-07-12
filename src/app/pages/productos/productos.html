@@ -30,9 +30,10 @@
 
       <div class="col-md-3">
         <label class="form-label invisible">Agregar</label>
-        <button type="button" class="btn btn-primary w-100" (click)="abrirNuevoProducto()">
+        <button type="button" class="btn btn-primary w-100" (click)="agregarProducto()" [disabled]="!selectedMachine">
           <i class="bi bi-plus-circle"></i> Agregar Producto
         </button>
+
 
       </div>
     </div>
@@ -45,15 +46,15 @@
             <th>Código</th>
             <th>Producto</th>
             <th>Material</th>
-            <th>Altura (cm)</th>
-            <th>Ancho (cm)</th>
-            <th>Profundidad (cm)</th>
+            <th *ngIf="tipoMaquinaSeleccionada !== 'SUB'">Altura (cm)</th>
+            <th *ngIf="tipoMaquinaSeleccionada !== 'SUB'">Ancho (cm)</th>
+            <th *ngIf="tipoMaquinaSeleccionada === 'FDA'">Profundidad (cm)</th>
             <th>Producción</th>
             <th>Post-proceso</th>
             <th>Total</th>
-            <th>Cant. Material (gr)</th>
+            <th *ngIf="tipoMaquinaSeleccionada === 'FDA'">Cant. Material (gr)</th>
             <th>Costo Material</th>
-            <th>Costo Sublimación</th>
+            <th *ngIf="tipoMaquinaSeleccionada === 'SUB'">Costo Sublimación</th>
             <th>Precio</th>
             <th>Acciones</th>
           </tr>
@@ -63,15 +64,15 @@
             <td>{{ item.codigo }}</td>
             <td>{{ item.producto }}</td>
             <td>{{ item.nombreMaterial }}</td>
-            <td>{{ item.altura }}</td>
-            <td>{{ item.ancho }}</td>
-            <td>{{ item.profundidad }}</td>
+            <td *ngIf="tipoMaquinaSeleccionada !== 'SUB'">{{ item.altura }}</td>
+            <td *ngIf="tipoMaquinaSeleccionada !== 'SUB'">{{ item.ancho }}</td>
+            <td *ngIf="tipoMaquinaSeleccionada === 'FDA'">{{ item.profundidad }}</td>
             <td>{{ item.horas }}h {{ item.minutos }}m</td>
             <td>{{ item.tiempoPostProceso }}</td>
             <td>{{ item.tiempoTotal }}</td>
-            <td>{{ item.cantidadMaterial }}</td>
+            <td *ngIf="tipoMaquinaSeleccionada === 'FDA'">{{ item.cantidadMaterial }}</td>
             <td>{{ item.costoMaterial | currency }}</td>
-            <td>
+            <td *ngIf="tipoMaquinaSeleccionada === 'SUB'">
               {{ item.costoSublimacion !== null ? (item.costoSublimacion | currency) : '-' }}
             </td>
             <td>{{ item.precio | currency }}</td>
@@ -79,7 +80,6 @@
               <button class="btn btn-sm btn-secondary" (click)="seleccionarProducto(item)">
                 <i class="bi bi-pencil"></i>
               </button>
-
               <button class="btn btn-sm btn-danger ms-1">
                 <i class="bi bi-trash"></i>
               </button>
@@ -88,6 +88,12 @@
         </tbody>
       </table>
     </div>
+    <ng-template #sinDatos>
+      <div class="text-center my-4">
+        <em>No hay datos para mostrar.</em>
+      </div>
+    </ng-template>
+
     <ng-template #sinDatos>
       <div class="text-center my-4">
         <em>No hay datos para mostrar.</em>

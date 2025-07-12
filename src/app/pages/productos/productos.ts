@@ -78,6 +78,8 @@ export class Productos {
   pages: number[] = [];
   productoSeleccionado: Producto | null = null;
   esNuevoProducto = false;
+  tipoMaquinaSeleccionada: string | null = null;
+
   
 
   private apiUrl = 'http://127.0.0.1:8000/api';
@@ -118,7 +120,7 @@ export class Productos {
       params.search = this.searchTerm.trim();
     }
 
-    this.http.get<any>(`${this.apiUrl}/productos/por-tipo-maquina/${this.selectedMachine}`, { params })
+    this.http.get<any>(`${this.apiUrl}/producto/por-tipo-maquina/${this.selectedMachine}`, { params })
       .subscribe({
         next: (response) => {
           const productosApi = response.data?.Productos || [];
@@ -154,10 +156,13 @@ export class Productos {
       });
   }
 
-  filterByMachine() {
-    this.currentPage = 1;
-    this.consultarProductos();
-  }
+ filterByMachine() {
+  this.currentPage = 1;
+  const maquina = this.maquinas.find(m => m.IdTipoMaquina === this.selectedMachine);
+  this.tipoMaquinaSeleccionada = maquina ? maquina.CodigoMaquina : null;
+  this.consultarProductos();
+}
+
 
   goToPage(page: number) {
     if (page < 1 || page > this.totalPages) return;
@@ -197,9 +202,38 @@ private crearProductoVacio(): Producto {
 }
 
 agregarProducto() {
+  if (this.selectedMachine == null) {
+    return;
+  }
+
   this.esNuevoProducto = true;
-  this.productoSeleccionado = this.crearProductoVacio();
+  this.productoSeleccionado = {
+    codigo: '',
+    producto: '',
+    altura: 0,
+    ancho: 0,
+    profundidad: 0,
+    horas: 0,
+    minutos: 0,
+    tiempoPostProceso: '00:00:00',
+    tiempoTotal: '0h 0m',
+    cantidadMaterial: 0,
+    costoMaterial: 0,
+    costoSublimacion: null,
+    precio: 0,
+    idTipoMaquina: this.selectedMachine, // Preseleccionar
+    idMaterial: undefined,
+    idProducto: undefined,
+    nombreMaterial: ''
+  };
+
+  // Mostrar modal programáticamente
+  const modalElement = document.getElementById('modalAgregarProducto');
+  const modalInstance = new bootstrap.Modal(modalElement!);
+  modalInstance.show();
 }
+
+
 abrirNuevoProducto() {
   this.esNuevoProducto = true;
   this.productoSeleccionado = {
@@ -237,7 +271,7 @@ seleccionarProducto(producto: Producto) {
   );
   modal.show();
 }
-
-
   
 }
+
+
