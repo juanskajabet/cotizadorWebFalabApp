@@ -1,129 +1,174 @@
-<form>
-  <!-- Información del Producto -->
-  <h6 class="fw-bold mt-3">Información del Producto</h6>
-  <div class="row g-3 mb-3">
-    <div class="col-md-4">
-      <label class="form-label">Código del Producto</label>
-      <input type="text" class="form-control" [value]="producto?.codigo" readonly />
-    </div>
-    <div class="col-md-4">
-      <label class="form-label">Máquina</label>
-      <select class="form-select" *ngIf="maquinas.length > 0" [(ngModel)]="producto.idTipoMaquina" name="idTipoMaquina">
-        <option [ngValue]="null">Seleccione un tipo de máquina</option>
-        <option *ngFor="let maquina of maquinas" [ngValue]="maquina.IdTipoMaquina">
-          {{ maquina.Nombre }} ({{ maquina.CodigoMaquina }})
-        </option>
-      </select>
-    </div>
-
-
-    <div class="col-md-4">
-      <label class="form-label">Material</label>
-      <input type="text" class="form-control" [value]="producto?.idMaterial" readonly />
-    </div>
-
-  </div>
-  <div class="row g-3 mb-12">
-    <div class="col-md-6">
-      <label class="form-label">Descripción del Producto</label>
-      <input type="text" class="form-control" [(ngModel)]="producto.producto" name="descripcion" />
-    </div>
-  </div>
-  <!-- Parámetros Dimensiones -->
-  <h6 class="fw-bold mt-3">Parámetros Dimensiones</h6>
-  <div class="row g-3 mb-3">
-    <div class="col-md-4">
-      <label class="form-label">Altura</label>
-      <div class="input-group">
-        <input type="number" class="form-control" min="0" step="0.01" [(ngModel)]="producto.altura" name="altura" />
-        <span class="input-group-text">cm</span>
+<div class="modal-dialog modal-dialog-centered modal-md">
+  <div class="modal-content p-4">
+    <form>
+      <!-- Información del Producto -->
+      <h5 class="fw-bold mb-3">Información del Producto</h5>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Código del Producto</label>
+          <input type="text" class="form-control" [value]="producto?.codigo" readonly />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Máquina</label>
+          <select
+            class="form-select"
+            [(ngModel)]="producto.idTipoMaquina"
+            name="idTipoMaquina"
+            (change)="onMaquinaChange()"
+            [disabled]="!esNuevoProducto">
+            <option [ngValue]="undefined">Seleccione máquina</option>
+            <option *ngFor="let m of maquinas" [ngValue]="m.IdTipoMaquina">
+              {{ m.Nombre }} ({{ m.CodigoMaquina }})
+            </option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Material</label>
+          <select
+            class="form-select"
+            [(ngModel)]="producto.idMaterial"
+            name="idMaterial"
+            (change)="onMaterialChange()">
+            <option [ngValue]="undefined">Seleccione material</option>
+            <option *ngFor="let mat of materialesFiltrados" [ngValue]="mat.IdMaterial">
+              {{ mat.NombreMaterial }} ({{ mat.CodigoMaterial }})
+            </option>
+          </select>
+        </div>
       </div>
-    </div>
-    <div class="col-md-4">
-      <label class="form-label">Ancho</label>
-      <div class="input-group">
-        <input type="number" class="form-control" min="0" step="0.01" [(ngModel)]="producto.ancho" name="ancho" />
-        <span class="input-group-text">cm</span>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <label class="form-label">Profundidad</label>
-      <div class="input-group">
-        <input type="number" class="form-control" min="0" step="0.01" [(ngModel)]="producto.profundidad"
-          name="profundidad" />
-        <span class="input-group-text">cm</span>
-      </div>
-    </div>
-  </div>
 
-  <!-- Parámetros Tiempos -->
-  <h6 class="fw-bold mt-3">Parámetros Tiempos</h6>
-  <div class="row g-3 mb-3">
-    <div class="col-md-3">
-      <label class="form-label">Horas</label>
-      <input type="number" class="form-control" min="0" step="1" [(ngModel)]="producto.horas" name="horas"
-        (ngModelChange)="actualizarTiempoTotal()" />
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">Minutos</label>
-      <input type="number" class="form-control" min="0" step="1" [(ngModel)]="producto.minutos" name="minutos"
-        (ngModelChange)="actualizarTiempoTotal()" />
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">Post Procesamiento</label>
-      <input type="text" class="form-control" [(ngModel)]="producto.tiempoPostProceso" name="postProceso" readonly />
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">Total</label>
-      <input type="text" class="form-control" [value]="producto.tiempoTotal" readonly />
-    </div>
-  </div>
-
-  <!-- Parámetros Material -->
-  <h6 class="fw-bold mt-3">Parámetros Material</h6>
-  <div class="row g-3 mb-3">
-    <div class="col-md-4">
-      <label class="form-label">Cantidad Material</label>
-      <input type="number" class="form-control" min="0" step="0.01" [(ngModel)]="producto.cantidadMaterial"
-        name="cantidadMaterial" />
-    </div>
-    <div class="col-md-4">
-      <label class="form-label">Costo Material</label>
-      <div class="input-group">
-        <span class="input-group-text">$</span>
-        <input type="number" class="form-control" min="0" step="0.01" [(ngModel)]="producto.costoMaterial"
-          name="costoMaterial" />
+      <div class="mt-3">
+        <label class="form-label">Descripción</label>
+        <input type="text" class="form-control" [(ngModel)]="producto.producto" name="descripcion" />
       </div>
-    </div>
-    <div class="col-md-4">
-      <label class="form-label">Costo Sublimación</label>
-      <div class="input-group">
-        <span class="input-group-text">$</span>
-        <input type="number" class="form-control" min="0" step="0.01" [(ngModel)]="producto.costoSublimacion"
-          name="costoSublimacion" />
-      </div>
-    </div>
-  </div>
 
-  <!-- Información Facturación -->
-  <h6 class="fw-bold mt-3">Información Facturación</h6>
-  <div class="row g-3 mb-3">
-    <div class="col-md-4">
-      <label class="form-label">Precio</label>
-      <div class="input-group">
-        <span class="input-group-text">$</span>
-        <input type="number" class="form-control" [value]="producto.precio" readonly />
+      <!-- Parámetros Dimensiones -->
+      <h6 class="fw-bold mt-4">Dimensiones</h6>
+      <div class="row g-3">
+        <div class="col-md-4" *ngFor="let dim of ['altura','ancho','profundidad']">
+          <label class="form-label">{{ dim | titlecase }}</label>
+          <div class="input-group">
+            <input
+              type="number"
+              class="form-control"
+              min="0"
+              step="0.01"
+              [(ngModel)]="producto[dim]"
+              [name]="dim"/>
+            <span class="input-group-text">cm</span>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Botones -->
-  <div class="d-flex justify-content-end mt-4">
-    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
-      Atrás
-    </button>
-    <button type="button" class="btn btn-primary">
-      Guardar
-    </button>
+      <!-- Tiempos -->
+      <h6 class="fw-bold mt-4">Tiempos</h6>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">Horas</label>
+          <input
+            type="number"
+            class="form-control"
+            min="0"
+            step="1"
+            [(ngModel)]="producto.horas"
+            name="horas"
+            (ngModelChange)="actualizarTiempoTotal()" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Minutos</label>
+          <input
+            type="number"
+            class="form-control"
+            min="0"
+            step="1"
+            [(ngModel)]="producto.minutos"
+            name="minutos"
+            (ngModelChange)="actualizarTiempoTotal()" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Post Procesamiento</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="producto.tiempoPostProceso"
+            name="postProceso"
+            readonly />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Total</label>
+          <input
+            type="text"
+            class="form-control"
+            [value]="producto.tiempoTotal"
+            readonly />
+        </div>
+      </div>
+
+      <!-- Material -->
+      <h6 class="fw-bold mt-4">Material</h6>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Cantidad</label>
+          <input
+            type="number"
+            class="form-control"
+            min="0"
+            step="0.01"
+            [(ngModel)]="producto.cantidadMaterial"
+            name="cantidadMaterial" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Costo</label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input
+              type="number"
+              class="form-control"
+              min="0"
+              step="0.01"
+              [(ngModel)]="producto.costoMaterial"
+              name="costoMaterial" />
+          </div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Costo Sublimación</label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input
+              type="number"
+              class="form-control"
+              min="0"
+              step="0.01"
+              [(ngModel)]="producto.costoSublimacion"
+              name="costoSublimacion" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Facturación -->
+      <h6 class="fw-bold mt-4">Facturación</h6>
+      <div class="col-md-4">
+        <label class="form-label">Precio</label>
+        <div class="input-group">
+          <span class="input-group-text">$</span>
+          <input type="number" class="form-control" [value]="producto.precio" readonly />
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="d-flex justify-content-end mt-4">
+        <button
+          type="button"
+          class="btn btn-secondary me-2"
+          data-bs-dismiss="modal">
+          Atrás
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary">
+          Guardar
+        </button>
+      </div>
+    </form>
   </div>
-</form>
+</div>

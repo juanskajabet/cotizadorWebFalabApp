@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ProductoDialogo } from './producto-dialogo/producto-dialogo';
 
+declare var bootstrap: any;
+
 interface Producto {
   codigo: string;
   producto: string;
@@ -23,7 +25,6 @@ interface Producto {
   idProducto?: number;
   nombreMaterial?: string;
 }
-
 
 interface TipoMaquina {
   IdTipoMaquina: number;
@@ -76,6 +77,8 @@ export class Productos {
   totalPages = 1;
   pages: number[] = [];
   productoSeleccionado: Producto | null = null;
+  esNuevoProducto = false;
+  
 
   private apiUrl = 'http://127.0.0.1:8000/api';
 
@@ -139,10 +142,7 @@ export class Productos {
             idMaterial: p.IdMaterial,
             idProducto: p.IdProducto,
             nombreMaterial: p.NombreMaterial
-            
-
           }));
-
 
           this.paginatedData = this.data;
           this.totalPages = Math.ceil(this.totalRegistros / this.pageSize);
@@ -174,12 +174,70 @@ export class Productos {
     this.currentPage = 1;
     this.consultarProductos();
   }
+private crearProductoVacio(): Producto {
+  return {
+    idProducto: 0,
+    codigo: '',
+    producto: '',
+    altura: 0,
+    ancho: 0,
+    profundidad: 0,
+    horas: 0,
+    minutos: 0,
+    tiempoPostProceso: '00:00:00',
+    tiempoTotal: '0h 0m',
+    cantidadMaterial: 0,
+    costoMaterial: 0,
+    costoSublimacion: null,
+    precio: 0,
+    idTipoMaquina: undefined,
+    idMaterial: undefined,
+    nombreMaterial: ''
+  };
+}
 
-  agregarProducto() {
-    alert('Funcionalidad de agregar producto pendiente.');
-  }
+agregarProducto() {
+  this.esNuevoProducto = true;
+  this.productoSeleccionado = this.crearProductoVacio();
+}
+abrirNuevoProducto() {
+  this.esNuevoProducto = true;
+  this.productoSeleccionado = {
+    codigo: '',
+    producto: '',
+    altura: 0,
+    ancho: 0,
+    profundidad: 0,
+    horas: 0,
+    minutos: 0,
+    tiempoPostProceso: '00:30:00',
+    tiempoTotal: '0h 0m',
+    cantidadMaterial: 0,
+    costoMaterial: 0,
+    costoSublimacion: null,
+    precio: 0,
+    idTipoMaquina: undefined,
+    idMaterial: undefined,
+    idProducto: 0, 
+    nombreMaterial: ''
+  };
 
-  seleccionarProducto(producto: Producto) {
-    this.productoSeleccionado = { ...producto };
-  }
+  const modal = new bootstrap.Modal(
+    document.getElementById('modalAgregarProducto')!
+  );
+  modal.show();
+}
+
+seleccionarProducto(producto: Producto) {
+  this.esNuevoProducto = false;
+  this.productoSeleccionado = { ...producto };
+
+  const modal = new bootstrap.Modal(
+    document.getElementById('modalAgregarProducto')!
+  );
+  modal.show();
+}
+
+
+  
 }
