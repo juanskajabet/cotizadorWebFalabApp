@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { EventEmitter, Output } from '@angular/core';
 
 declare var bootstrap: any;
 
@@ -32,6 +33,8 @@ interface Material {
 export class ProductoDialogo {
   @Input() producto: any;
   @Input() key?: string | number;
+  @Output() productoGuardado = new EventEmitter<void>();
+
 
 
   maquinas: TipoMaquina[] = [];
@@ -151,6 +154,7 @@ guardarProducto() {
       if (modalElement) {
         const modal = bootstrap.Modal.getInstance(modalElement);
         modal?.hide();
+         this.productoGuardado.emit();
       }
     },
     error: (err) => {

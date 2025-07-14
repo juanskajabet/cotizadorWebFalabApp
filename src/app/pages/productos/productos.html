@@ -145,9 +145,9 @@
       </div>
       <div class="modal-body p-3">
         <ng-container *ngIf="productoSeleccionado as prod">
-          <app-producto-dialogo [producto]="prod" [attr.key]="prod.idProducto"></app-producto-dialogo>
+          <app-producto-dialogo [producto]="prod" [attr.key]="prod.idProducto"  (productoGuardado)="consultarProductos()"></app-producto-dialogo>
         </ng-container>
       </div>
     </div>
   </div>
-</div>
+</div>           

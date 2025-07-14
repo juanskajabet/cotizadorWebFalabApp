@@ -1,87 +1,99 @@
-<form>
-  <!-- Título principal -->
-  <h4 class="fw-bold text-center mb-4">
-    Configuración Costos y Tiempo
-  </h4>
+<div class="modal-dialog modal-dialog-centered modal-md">
+  <div class="modal-content p-4">
+    <form>
+      <h5 class="fw-bold mb-3">
+        {{ esNuevaConfiguracion ? 'Agregar Configuración' : 'Editar Configuración' }}
+      </h5>
 
-  <!-- Información de Costos -->
-  <h6 class="fw-bold mt-3">Información de Costos</h6>
-  <div class="row g-3 mb-3">
-    <div class="col-md-6">
-      <label class="form-label">Código del Producto</label>
-      <select class="form-select">
-        <option selected>Seleccione</option>
-        <option>COD-1</option>
-        <option>COD-2</option>
-        <option>COD-3</option>
-      </select>
-    </div>
-    <div class="col-md-6">
-      <label class="form-label">Descripción del Producto</label>
-      <input type="text" class="form-control" />
-    </div>
-    <div class="col-md-6">
-      <label class="form-label">Costo por Kg.</label>
-      <div class="input-group">
-        <span class="input-group-text">$</span>
-        <input type="number" class="form-control" />
+      <!-- Material (readonly) -->
+      <div class="mb-3">
+        <label class="form-label">Material</label>
+        <input type="text" class="form-control" [value]="configuracion?.NombreMaterial" readonly />
       </div>
-    </div>
-    <div class="col-md-6">
-      <label class="form-label">Costo por g.</label>
-      <div class="input-group">
-        <span class="input-group-text">$</span>
-        <input type="number" class="form-control" />
-      </div>
-    </div>
-    <div class="col-md-6">
-      <label class="form-label">Costo por M2.</label>
-      <div class="input-group">
-        <span class="input-group-text">$</span>
-        <input type="number" class="form-control" />
-      </div>
-    </div>
-    <div class="col-md-6">
-      <label class="form-label">Costo por A4</label>
-      <div class="input-group">
-        <span class="input-group-text">$</span>
-        <input type="number" class="form-control" />
-      </div>
-    </div>
-  </div>
 
-  <!-- Información de Alquiler -->
-  <h6 class="fw-bold mt-3">Información de Alquiler</h6>
-  <div class="row g-3 mb-3">
-    <div class="col-md-6">
-      <label class="form-label">Alquiler H</label>
-      <input type="number" class="form-control" />
-    </div>
-    <div class="col-md-6">
-      <label class="form-label">Alquiler M</label>
-      <input type="number" class="form-control" />
-    </div>
-  </div>
+      <!-- FDA y SDA: Costo por Kg y Gr, AlquilerHora, TiempoPostProc -->
+      <ng-container *ngIf="configuracion?.CodigoMaquina === 'FDA' || configuracion?.CodigoMaquina === 'SDA'">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Costo por Kg</label>
+            <input type="number" class="form-control" min="0" step="0.01"
+              [(ngModel)]="configuracion.CostoPorKg" name="costoPorKg" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Costo por Gr</label>
+            <input type="number" class="form-control" min="0" step="0.0001"
+              [(ngModel)]="configuracion.CostoPorGr" name="costoPorGr" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Alquiler por Hora</label>
+            <input type="number" class="form-control" min="0" step="0.01"
+              [(ngModel)]="configuracion.AlquilerHora" name="alquilerHora" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Tiempo Post Proceso</label>
+            <input type="text" class="form-control"
+              [(ngModel)]="configuracion.TiempoPostProc" name="tiempoPostProc" />
+          </div>
+        </div>
+      </ng-container>
 
-  <!-- Información Facturación -->
-  <h6 class="fw-bold mt-3">Información Facturación</h6>
-  <div class="row g-3 mb-3">
-    <div class="col-md-6">
-      <label class="form-label">Tiempo Post Procesamiento</label>
-      <input type="number" class="form-control" />
-    </div>
-  </div>
+      <!-- LAS: AlquilerMinuto, CostoPorM2, TiempoPostProc -->
+      <ng-container *ngIf="configuracion?.CodigoMaquina === 'LAS'">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Alquiler por Minuto</label>
+            <input type="number" class="form-control" min="0" step="0.01"
+              [(ngModel)]="configuracion.AlquilerMinuto" name="alquilerMinuto" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Costo por m²</label>
+            <input type="number" class="form-control" min="0" step="0.01"
+              [(ngModel)]="configuracion.CostoPorM2" name="costoPorM2" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Tiempo Post Proceso</label>
+            <input type="text" class="form-control"
+              [(ngModel)]="configuracion.TiempoPostProc" name="tiempoPostProc" />
+          </div>
+        </div>
+      </ng-container>
 
-  <!-- Botones -->
-  <div class="d-flex justify-content-end mt-4">
-    <button
-      type="button"
-      class="btn btn-secondary me-2"
-      data-bs-dismiss="modal">
-      Atrás
-    </button>
-    <button type="button" class="btn btn-primary">
-      Guardar
-    </button>
+      <!-- SUB: CostoUsoA4, CostoFijo, TiempoPostProc -->
+      <ng-container *ngIf="configuracion?.CodigoMaquina === 'SUB'">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Costo por Uso A4</label>
+            <input type="number" class="form-control" min="0" step="0.01"
+              [(ngModel)]="configuracion.CostoUsoA4" name="costoUsoA4" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Costo Fijo</label>
+            <input type="number" class="form-control" min="0" step="0.01"
+              [(ngModel)]="configuracion.CostoFijo" name="costoFijo" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Tiempo Post Proceso</label>
+            <input type="text" class="form-control"
+              [(ngModel)]="configuracion.TiempoPostProc" name="tiempoPostProc" />
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Botones -->
+      <div class="d-flex justify-content-end mt-4">
+        <button
+          type="button"
+          class="btn btn-secondary me-2"
+          data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="guardarConfiguracion()">
+          Guardar
+        </button>
+      </div>
+    </form>
   </div>
-</form>
+</div>
