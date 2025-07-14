@@ -5,7 +5,7 @@
         {{ esNuevaConfiguracion ? 'Agregar Configuración' : 'Editar Configuración' }}
       </h5>
 
-      <!-- Material (readonly) -->
+      <!-- Material -->
       <div class="mb-3">
         <label class="form-label">Material</label>
         <select class="form-select" [(ngModel)]="configuracion.IdMaterial" name="idMaterial">
@@ -16,8 +16,7 @@
         </select>
       </div>
 
-
-      <!-- FDA y SDA: Costo por Kg y Gr, AlquilerHora, TiempoPostProc -->
+      <!-- FDA y SDA -->
       <ng-container *ngIf="configuracion?.CodigoMaquina === 'FDA' || configuracion?.CodigoMaquina === 'SDA'">
         <div class="row g-3">
           <div class="col-md-6">
@@ -42,7 +41,7 @@
         </div>
       </ng-container>
 
-      <!-- LAS: AlquilerMinuto, CostoPorM2, TiempoPostProc -->
+      <!-- LAS -->
       <ng-container *ngIf="configuracion?.CodigoMaquina === 'LAS'">
         <div class="row g-3">
           <div class="col-md-6">
@@ -62,7 +61,7 @@
         </div>
       </ng-container>
 
-      <!-- SUB: CostoUsoA4, CostoFijo, TiempoPostProc -->
+      <!-- SUB -->
       <ng-container *ngIf="configuracion?.CodigoMaquina === 'SUB'">
         <div class="row g-3">
           <div class="col-md-6">
@@ -89,7 +88,7 @@
         </button>
         <button type="button" class="btn btn-primary" (click)="guardarConfiguracion()">
           Guardar
-        </button>
+          </button>
       </div>
     </form>
   </div>

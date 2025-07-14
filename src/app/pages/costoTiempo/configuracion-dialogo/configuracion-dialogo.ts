@@ -40,7 +40,7 @@ interface Material {
 })
 export class ConfiguracionDialogo implements OnChanges {
   @Input() configuracion: Configuracion = {
-    IdParametroCosto: 0,
+    IdParametroCosto: undefined,
     IdMaterial: undefined,
     NombreMaterial: '',
     CostoPorKg: null,
@@ -64,7 +64,6 @@ export class ConfiguracionDialogo implements OnChanges {
 
   constructor(private http: HttpClient) {}
 
-  // Cada vez que cambian los inputs
   ngOnChanges(changes: SimpleChanges) {
     if (changes['configuracion']) {
       this.cargarMateriales();
@@ -73,7 +72,6 @@ export class ConfiguracionDialogo implements OnChanges {
 
   cargarMateriales() {
     if (!this.configuracion?.CodigoMaquina) {
-      console.warn('No hay CodigoMaquina definido.');
       this.materiales = [];
       return;
     }
@@ -87,18 +85,17 @@ export class ConfiguracionDialogo implements OnChanges {
 
     const idTipoMaquina = tipoMaquinaMap[this.configuracion.CodigoMaquina];
     if (!idTipoMaquina) {
-      console.error('Tipo de máquina inválido.');
       this.materiales = [];
       return;
     }
 
     this.http.get<any>(`${this.apiUrl}/tipomaterial/por-maquina/${idTipoMaquina}`)
       .subscribe({
-        next: (response) => {
-          this.materiales = response.data || [];
+        next: (res) => {
+          this.materiales = res.data || [];
         },
-        error: (error) => {
-          console.error('Error cargando materiales:', error);
+        error: (err) => {
+          console.error('Error cargando materiales:', err);
           this.materiales = [];
         }
       });
@@ -139,27 +136,56 @@ export class ConfiguracionDialogo implements OnChanges {
         break;
     }
 
-    this.http.post(`${this.apiUrl}/parametros-costo/agregar`, payload)
-      .subscribe({
-        next: () => {
-          const alert = document.createElement('div');
-          alert.className = 'alert alert-success';
-          alert.textContent = 'Configuración guardada correctamente.';
-          document.body.appendChild(alert);
-          setTimeout(() => alert.remove(), 3000);
-
-          const modalEl = document.querySelector('.modal.show');
-          if (modalEl) {
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            modal.hide();
+    if (this.esNuevaConfiguracion) {
+      // Crear nuevo registro
+      this.http.post(`${this.apiUrl}/parametros-costo/agregar`, payload)
+        .subscribe({
+          next: () => {
+            this.mostrarNotificacion('Configuración agregada correctamente.');
+            this.cerrarModal();
+            this.configuracionGuardada.emit();
+          },
+          error: (err) => {
+            console.error('Error al agregar:', err);
+            alert('Ocurrió un error al agregar.');
           }
+        });
+    } else {
+      // Actualizar registro existente
+      if (!this.configuracion.IdParametroCosto) {
+        alert('ID de configuración no definido para actualizar.');
+        return;
+      }
 
-          this.configuracionGuardada.emit();
-        },
-        error: (error) => {
-          console.error('Error guardando configuración:', error);
-          alert('Ocurrió un error al guardar.');
-        }
-      });
+      this.http.put(`${this.apiUrl}/parametros-costo/actualizar/${this.configuracion.IdParametroCosto}`, payload)
+        .subscribe({
+          next: () => {
+            this.mostrarNotificacion('Configuración actualizada correctamente.');
+            this.cerrarModal();
+            this.configuracionGuardada.emit();
+          },
+          error: (err) => {
+            console.error('Error al actualizar:', err);
+            alert('Ocurrió un error al actualizar.');
+          }
+        });
+    }
+  }
+
+  private mostrarNotificacion(mensaje: string) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-success position-fixed top-0 start-50 translate-middle-x mt-3';
+    alertDiv.style.zIndex = '9999';
+    alertDiv.textContent = mensaje;
+    document.body.appendChild(alertDiv);
+    setTimeout(() => alertDiv.remove(), 3000);
+  }
+
+  private cerrarModal() {
+    const modalEl = document.querySelector('.modal.show');
+    if (modalEl) {
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      modal.hide();
+    }
   }
 }

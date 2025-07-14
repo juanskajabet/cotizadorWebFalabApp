@@ -90,7 +90,6 @@
 
   <!-- Paso 2 -->
   <div *ngIf="paso === 2">
-    <!-- Resumen Información Personal -->
     <div class="card mb-4">
       <div class="card-body">
         <h5 class="card-title">Información Personal</h5>
@@ -116,7 +115,7 @@
       </div>
     </div>
 
-    <!-- Tabla de Productos -->
+    <!-- Tabla productos -->
     <div class="table-responsive">
       <table class="table table-bordered">
         <thead class="table-light">
@@ -190,54 +189,56 @@
       </div>
     </div>
 
-<!-- Tabla Productos -->
-<div class="table-responsive">
-  <table class="table table-bordered align-middle text-center">
-    <thead class="table-light">
-      <tr>
-        <th>Código</th>
-        <th>Máquina</th>
-        <th>Producto</th>
-        <th>Cantidad</th>
-        <th>Tiempo Unitario</th>
-        <th>Tiempo Total</th>
-        <th>Precio Unitario</th>
-        <th>Precio Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let p of cotizacion.productos">
-        <td>{{ p.codigo }}</td>
-        <td>{{ p.maquina }}</td>
-        <td>{{ p.nombre }}</td>
-        <td>{{ p.cantidad }}</td>
-        <td>{{ p.tiempoUnitario }}</td>
-        <td>{{ p.tiempoTotal }}</td>
-        <td>{{ p.precioUnitario | currency }}</td>
-        <td>{{ p.precioTotal | currency }}</td>
-      </tr>
-      <!-- Fila Total Tiempo -->
-      <tr class="fw-bold">
-        <td colspan="4"></td>
-        <td colspan="2">Total (hh:mm): {{ calcularTiempoTotal() }}</td>
-        <td>Subtotal</td>
-        <td>{{ calcularSubtotal() | currency }}</td>
-      </tr>
-      <!-- Fila IVA -->
-      <tr class="fw-bold">
-        <td colspan="6"></td>
-        <td>IVA (15%)</td>
-        <td>{{ calcularIva() | currency }}</td>
-      </tr>
-      <!-- Fila Total -->
-      <tr class="fw-bold">
-        <td colspan="6"></td>
-        <td>Total</td>
-        <td>{{ calcularTotal() | currency }}</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+    <!-- Tabla productos resumen -->
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle text-center">
+        <thead class="table-light">
+          <tr>
+            <th>Código</th>
+            <th>Máquina</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Tiempo Unitario</th>
+            <th>Tiempo Total</th>
+            <th>Precio Unitario</th>
+            <th>Precio Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of cotizacion.productos">
+            <td>{{ p.codigo }}</td>
+            <td>{{ p.maquina }}</td>
+            <td>{{ p.nombre }}</td>
+            <td>{{ p.cantidad }}</td>
+            <td>{{ p.tiempoUnitario }}</td>
+            <td>{{ p.tiempoTotal }}</td>
+            <td>{{ p.precioUnitario | currency }}</td>
+            <td>{{ p.precioTotal | currency }}</td>
+          </tr>
+          <tr class="fw-bold">
+            <td colspan="4"></td>
+            <td colspan="2">Total (hh:mm): {{ calcularTiempoTotal() }}</td>
+            <td>Subtotal</td>
+            <td>{{ calcularSubtotal() | currency }}</td>
+          </tr>
+          <tr class="fw-bold">
+            <td colspan="6"></td>
+            <td>IVA (15%)</td>
+            <td>{{ calcularIva() | currency }}</td>
+          </tr>
+          <tr class="fw-bold">
+            <td colspan="6"></td>
+            <td>Total</td>
+            <td>{{ calcularTotal() | currency }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Notificación success -->
+  <div *ngIf="mostrarNotificacion" class="alert alert-success mt-3 text-center">
+    Cotización generada correctamente.
   </div>
 
   <!-- Navegación -->
@@ -246,9 +247,11 @@
       *ngIf="paso > 1"
       type="button"
       class="btn btn-secondary"
+      [disabled]="cotizacionFinalizada"
       (click)="anteriorPaso()">
       Atrás
     </button>
+
     <button
       *ngIf="paso < 3"
       type="button"
@@ -257,12 +260,21 @@
       (click)="siguientePaso()">
       Siguiente
     </button>
+
     <button
-      *ngIf="paso === 3"
+      *ngIf="paso === 3 && !cotizacionFinalizada"
       type="button"
       class="btn btn-success ms-auto"
       (click)="guardarCotizacion()">
       Generar Cotización
+    </button>
+
+    <button
+      *ngIf="paso === 3 && cotizacionFinalizada"
+      type="button"
+      class="btn btn-primary ms-auto"
+      (click)="cancelar()">
+      Cotización Nueva
     </button>
   </div>
 </div>

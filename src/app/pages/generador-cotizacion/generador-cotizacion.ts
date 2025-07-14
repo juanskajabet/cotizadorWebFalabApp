@@ -33,9 +33,13 @@ export class GeneradorCotizacion {
 
   numeroFactura = '';
   fechaActual = new Date().toLocaleDateString();
-
-  // Valor global que se usará en guardar detalle
   idCotizacionGenerada: number | null = null;
+
+  // Para controlar la notificación
+  mostrarNotificacion = false;
+
+  // Control de estado final
+  cotizacionFinalizada = false;
 
   constructor(private http: HttpClient) {
     this.cargarProductos();
@@ -113,6 +117,7 @@ export class GeneradorCotizacion {
   cancelar() {
     this.paso = 1;
     this.idCotizacionGenerada = null;
+    this.cotizacionFinalizada = false;
     this.cotizacion = {
       nombre: '',
       apellido: '',
@@ -214,7 +219,6 @@ export class GeneradorCotizacion {
     this.http.post<any>('http://127.0.0.1:8000/api/cotizaciones', cabecera)
       .subscribe({
         next: (res) => {
-          // ✅ Guardamos el ID global
           this.idCotizacionGenerada = res.data?.IdCotizacion;
 
           if (!this.idCotizacionGenerada) {
@@ -231,8 +235,13 @@ export class GeneradorCotizacion {
 
           Promise.all(detalleRequests.map(r => r.toPromise()))
             .then(() => {
-              alert('Cotización generada correctamente.');
-              this.cancelar();
+              this.mostrarNotificacion = true;
+              this.cotizacionFinalizada = true;
+
+              // Ocultar notificación luego de 3 segundos
+              setTimeout(() => {
+                this.mostrarNotificacion = false;
+              }, 3000);
             })
             .catch(err => {
               console.error('Error generando detalle:', err);

@@ -33,3 +33,6 @@
   background-color: #c7d2fe; /* Fondo azul claro */
   color: #111;
 }
+.alert {
+  transition: opacity 0.5s ease-in-out;
+}

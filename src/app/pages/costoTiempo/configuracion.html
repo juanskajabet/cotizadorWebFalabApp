@@ -6,11 +6,7 @@
     <div class="row g-3 align-items-end">
       <div class="col-md-3">
         <label for="tipoMaquina" class="form-label">Tipo de Máquina</label>
-        <select
-          id="tipoMaquina"
-          class="form-select"
-          *ngIf="maquinas.length > 0"
-          [(ngModel)]="selectedMachine"
+        <select id="tipoMaquina" class="form-select" *ngIf="maquinas.length > 0" [(ngModel)]="selectedMachine"
           (change)="filterByMachine()">
           <option [ngValue]="null">Seleccione un tipo de máquina</option>
           <option *ngFor="let maquina of maquinas" [ngValue]="maquina.IdTipoMaquina">
@@ -25,24 +21,16 @@
       <div class="col-md-3">
         <label for="buscarResultados" class="form-label">Buscar en resultados</label>
         <div class="input-group">
-          <input
-            id="buscarResultados"
-            type="text"
-            class="form-control"
-            placeholder="Buscar"
-            [(ngModel)]="searchTerm" />
+          <input id="buscarResultados" type="text" class="form-control" placeholder="Buscar" [(ngModel)]="searchTerm" />
           <button class="btn btn-outline-primary" (click)="onBuscar()">
             <i class="bi bi-search"></i> Buscar
           </button>
         </div>
       </div>
 
-      <div class="col-md-3">
+      <div class="col-md-4">
         <label class="form-label invisible">Agregar</label>
-        <button
-          type="button"
-          class="btn btn-primary w-100"
-          (click)="agregarConfiguracion()"
+        <button type="button" class="btn btn-primary w-100" (click)="agregarConfiguracion()"
           [disabled]="!selectedMachine">
           <i class="bi bi-plus-circle"></i> Agregar Configuración
         </button>
@@ -71,22 +59,20 @@
           <tr *ngFor="let item of paginatedData">
             <td>{{ item.IdParametroCosto }}</td>
             <td>{{ item.NombreMaterial }}</td>
-            <td *ngIf="tipoMaquinaSeleccionada === 'FDA' || tipoMaquinaSeleccionada === 'SDA'">{{ item.CostoPorKg }}</td>
-            <td *ngIf="tipoMaquinaSeleccionada === 'FDA' || tipoMaquinaSeleccionada === 'SDA'">{{ item.CostoPorGr }}</td>
-            <td *ngIf="tipoMaquinaSeleccionada === 'FDA' || tipoMaquinaSeleccionada === 'SDA'">{{ item.AlquilerHora }}</td>
+            <td *ngIf="tipoMaquinaSeleccionada === 'FDA' || tipoMaquinaSeleccionada === 'SDA'">{{ item.CostoPorKg }}
+            </td>
+            <td *ngIf="tipoMaquinaSeleccionada === 'FDA' || tipoMaquinaSeleccionada === 'SDA'">{{ item.CostoPorGr }}
+            </td>
+            <td *ngIf="tipoMaquinaSeleccionada === 'FDA' || tipoMaquinaSeleccionada === 'SDA'">{{ item.AlquilerHora }}
+            </td>
             <td *ngIf="tipoMaquinaSeleccionada === 'LAS'">{{ item.AlquilerMinuto }}</td>
             <td *ngIf="tipoMaquinaSeleccionada === 'LAS'">{{ item.CostoPorM2 }}</td>
             <td *ngIf="tipoMaquinaSeleccionada === 'SUB'">{{ item.CostoUsoA4 }}</td>
             <td *ngIf="tipoMaquinaSeleccionada === 'SUB'">{{ item.CostoFijo }}</td>
             <td>{{ item.TiempoPostProc }}</td>
             <td>
-              <button
-                class="btn btn-sm btn-secondary"
-                (click)="seleccionarConfiguracion(item)">
+              <button class="btn btn-sm btn-secondary" (click)="seleccionarConfiguracion(item)">
                 <i class="bi bi-pencil"></i>
-              </button>
-              <button class="btn btn-sm btn-danger ms-1">
-                <i class="bi bi-trash"></i>
               </button>
             </td>
           </tr>
@@ -120,11 +106,7 @@
       </nav>
       <div class="ms-md-3 mt-2 mt-md-0">
         <label class="form-label mb-0 me-2">Registros por página:</label>
-        <select
-          class="form-select d-inline-block w-auto"
-          [(ngModel)]="pageSize"
-          (change)="onPageSizeChange()">
-          <option [ngValue]="2">2</option>
+        <select class="form-select d-inline-block w-auto" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
           <option [ngValue]="5">5</option>
           <option [ngValue]="10">10</option>
           <option [ngValue]="20">20</option>
@@ -135,11 +117,7 @@
 </div>
 
 <!-- Modal para agregar/editar configuración -->
-<div
-  class="modal fade"
-  id="modalAgregarProducto"
-  tabindex="-1"
-  aria-labelledby="modalAgregarProductoLabel"
+<div class="modal fade" id="modalAgregarProducto" tabindex="-1" aria-labelledby="modalAgregarProductoLabel"
   aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
@@ -148,18 +126,13 @@
           <i class="bi bi-plus-circle"></i>
           {{ esNuevaConfiguracion ? 'Agregar Configuración' : 'Editar Configuración' }}
         </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Cerrar"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <div class="modal-body p-3">
         <ng-container *ngIf="configuracionSeleccionada as config">
-          <app-configuracion-dialogo
-            [configuracion]="config"
-            [attr.key]="config.IdParametroCosto ?? 'nuevo'"
-            (configuracionGuardada)="consultarConfiguraciones()"></app-configuracion-dialogo>
+          <app-configuracion-dialogo [configuracion]="config" [esNuevaConfiguracion]="esNuevaConfiguracion"
+            [attr.key]="config.IdParametroCosto ?? 'nuevo'" (configuracionGuardada)="consultarConfiguraciones()">
+          </app-configuracion-dialogo>
         </ng-container>
       </div>
     </div>
