@@ -16,6 +16,10 @@ export const routes: Routes = [
         path: 'configuracion',
         loadComponent: () =>
             import('./pages/costoTiempo/configuracion').then(m => m.Configuracion)
+    },{
+        path: 'generador-cotizacion',
+        loadComponent: () =>
+            import('./pages/generador-cotizacion/generador-cotizacion').then(m => m.GeneradorCotizacion)
     }
     
 ];
