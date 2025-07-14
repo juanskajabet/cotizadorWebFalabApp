@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -20,10 +20,17 @@ interface Configuracion {
   CodigoMaquina?: string;
 }
 
+interface Material {
+  IdMaterial: number;
+  IdTipoMaquina: number;
+  CodigoMaterial: string;
+  NombreMaterial: string;
+}
+
 @Component({
   standalone: true,
   selector: 'app-configuracion-dialogo',
-   imports: [
+  imports: [
     CommonModule,
     FormsModule,
     HttpClientModule
@@ -31,29 +38,71 @@ interface Configuracion {
   templateUrl: './configuracion-dialogo.html',
   styleUrl: './configuracion-dialogo.css'
 })
-export class ConfiguracionDialogo {
- @Input() configuracion: Configuracion = {
-  IdParametroCosto: 0,
-  IdMaterial: undefined,
-  NombreMaterial: '',
-  CostoPorKg: null,
-  CostoPorGr: null,
-  AlquilerHora: null,
-  AlquilerMinuto: null,
-  CostoPorM2: null,
-  CostoUsoA4: null,
-  CostoFijo: null,
-  TiempoPostProc: '00:00:00',
-  CodigoMaquina: ''
-};
+export class ConfiguracionDialogo implements OnChanges {
+  @Input() configuracion: Configuracion = {
+    IdParametroCosto: 0,
+    IdMaterial: undefined,
+    NombreMaterial: '',
+    CostoPorKg: null,
+    CostoPorGr: null,
+    AlquilerHora: null,
+    AlquilerMinuto: null,
+    CostoPorM2: null,
+    CostoUsoA4: null,
+    CostoFijo: null,
+    TiempoPostProc: '00:00:00',
+    CodigoMaquina: ''
+  };
 
-  @Input() esNuevaConfiguracion: boolean = true;
+  @Input() esNuevaConfiguracion = true;
 
   @Output() configuracionGuardada = new EventEmitter<void>();
+
+  materiales: Material[] = [];
 
   private apiUrl = 'http://127.0.0.1:8000/api';
 
   constructor(private http: HttpClient) {}
+
+  // Cada vez que cambian los inputs
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['configuracion']) {
+      this.cargarMateriales();
+    }
+  }
+
+  cargarMateriales() {
+    if (!this.configuracion?.CodigoMaquina) {
+      console.warn('No hay CodigoMaquina definido.');
+      this.materiales = [];
+      return;
+    }
+
+    const tipoMaquinaMap: Record<string, number> = {
+      'FDA': 1,
+      'SDA': 2,
+      'LAS': 3,
+      'SUB': 5
+    };
+
+    const idTipoMaquina = tipoMaquinaMap[this.configuracion.CodigoMaquina];
+    if (!idTipoMaquina) {
+      console.error('Tipo de máquina inválido.');
+      this.materiales = [];
+      return;
+    }
+
+    this.http.get<any>(`${this.apiUrl}/tipomaterial/por-maquina/${idTipoMaquina}`)
+      .subscribe({
+        next: (response) => {
+          this.materiales = response.data || [];
+        },
+        error: (error) => {
+          console.error('Error cargando materiales:', error);
+          this.materiales = [];
+        }
+      });
+  }
 
   guardarConfiguracion() {
     if (!this.configuracion || !this.configuracion.IdMaterial) {
@@ -63,46 +112,48 @@ export class ConfiguracionDialogo {
 
     const payload: any = {
       IdMaterial: this.configuracion.IdMaterial,
+      CostoPorKg: null,
+      CostoPorGr: null,
+      AlquilerHora: null,
+      AlquilerMinuto: null,
+      CostoPorM2: null,
+      CostoUsoA4: null,
+      CostoFijo: null,
       TiempoPostProc: this.configuracion.TiempoPostProc ?? '00:00:00'
     };
 
-    // Filamento y Resina
-    if (this.configuracion.CodigoMaquina === 'FDA' || this.configuracion.CodigoMaquina === 'SDA') {
-      payload.CostoPorKg = this.configuracion.CostoPorKg ?? null;
-      payload.CostoPorGr = this.configuracion.CostoPorGr ?? null;
-      payload.AlquilerHora = this.configuracion.AlquilerHora ?? null;
-    }
-
-    // Laser
-    if (this.configuracion.CodigoMaquina === 'LAS') {
-      payload.AlquilerMinuto = this.configuracion.AlquilerMinuto ?? null;
-      payload.CostoPorM2 = this.configuracion.CostoPorM2 ?? null;
-    }
-
-    // Sublimadora
-    if (this.configuracion.CodigoMaquina === 'SUB') {
-      payload.CostoUsoA4 = this.configuracion.CostoUsoA4 ?? null;
-      payload.CostoFijo = this.configuracion.CostoFijo ?? null;
+    switch (this.configuracion.CodigoMaquina) {
+      case 'FDA':
+      case 'SDA':
+        payload.CostoPorKg = this.configuracion.CostoPorKg ?? null;
+        payload.CostoPorGr = this.configuracion.CostoPorGr ?? null;
+        payload.AlquilerHora = this.configuracion.AlquilerHora ?? null;
+        break;
+      case 'LAS':
+        payload.AlquilerMinuto = this.configuracion.AlquilerMinuto ?? null;
+        payload.CostoPorM2 = this.configuracion.CostoPorM2 ?? null;
+        break;
+      case 'SUB':
+        payload.CostoUsoA4 = this.configuracion.CostoUsoA4 ?? null;
+        payload.CostoFijo = this.configuracion.CostoFijo ?? null;
+        break;
     }
 
     this.http.post(`${this.apiUrl}/parametros-costo/agregar`, payload)
       .subscribe({
         next: () => {
-          // Mostrar alerta de éxito
           const alert = document.createElement('div');
           alert.className = 'alert alert-success';
           alert.textContent = 'Configuración guardada correctamente.';
           document.body.appendChild(alert);
           setTimeout(() => alert.remove(), 3000);
 
-          // Cerrar modal
           const modalEl = document.querySelector('.modal.show');
           if (modalEl) {
             const modal = bootstrap.Modal.getInstance(modalEl);
             modal.hide();
           }
 
-          // Emitir evento
           this.configuracionGuardada.emit();
         },
         error: (error) => {
@@ -111,5 +162,4 @@ export class ConfiguracionDialogo {
         }
       });
   }
-
 }

@@ -122,7 +122,7 @@ export class Configuracion {
   this.http.get<any>(`${this.apiUrl}/parametros-costo/buscar/maquina/${this.selectedMachine}`, { params })
     .subscribe({
       next: (response) => {
-        const configuracionesApi = response.data?.ParametrosCosto || [];
+        const configuracionesApi = response.data?.Parametros || [];
         this.totalRegistros = response.data?.totalRegistros || 0;
 
         this.data = configuracionesApi.map((c: ConfiguracionApi) => ({

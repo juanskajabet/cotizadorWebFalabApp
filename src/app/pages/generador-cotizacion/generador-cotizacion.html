@@ -1,0 +1,240 @@
+<div class="container my-4">
+  <h2 class="mb-4">Nueva Cotización</h2>
+
+  <!-- Pasos -->
+  <div class="steps mb-4 d-flex justify-content-between">
+    <div [class.active]="paso === 1">1 Información Personal</div>
+    <div [class.active]="paso === 2">2 Selección de Productos</div>
+    <div [class.active]="paso === 3">3 Generación de Factura</div>
+  </div>
+
+  <!-- Paso 1 -->
+  <div *ngIf="paso === 1">
+    <form>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Nombre</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="cotizacion.nombre"
+            name="nombre"
+            (blur)="marcarTocado('nombre')" />
+          <div *ngIf="campoTocado('nombre') && !validarNombre()" class="text-danger small">
+            Solo letras permitidas.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Apellido</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="cotizacion.apellido"
+            name="apellido"
+            (blur)="marcarTocado('apellido')" />
+          <div *ngIf="campoTocado('apellido') && !validarApellido()" class="text-danger small">
+            Solo letras permitidas.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Identificación</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="cotizacion.identificacion"
+            name="identificacion"
+            (blur)="marcarTocado('identificacion')" />
+          <div *ngIf="campoTocado('identificacion') && !validarIdentificacion()" class="text-danger small">
+            Máximo 15 números.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Correo Electrónico</label>
+          <input
+            type="email"
+            class="form-control"
+            [(ngModel)]="cotizacion.correo"
+            name="correo"
+            (blur)="marcarTocado('correo')" />
+          <div *ngIf="campoTocado('correo') && !validarCorreo()" class="text-danger small">
+            Correo no válido.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Dirección</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="cotizacion.direccion"
+            name="direccion"
+            (blur)="marcarTocado('direccion')" />
+          <div *ngIf="campoTocado('direccion') && !validarDireccion()" class="text-danger small">
+            Máximo 20 caracteres.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Teléfono</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="cotizacion.telefono"
+            name="telefono"
+            (blur)="marcarTocado('telefono')" />
+          <div *ngIf="campoTocado('telefono') && !validarTelefono()" class="text-danger small">
+            Debe tener 10 números.
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+ <!-- Paso 2 -->
+<div *ngIf="paso === 2">
+  <!-- Resumen Información Personal -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Información Personal</h5>
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Nombre:</strong> {{ cotizacion.nombre }} {{ cotizacion.apellido }}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Identificación:</strong> {{ cotizacion.identificacion }}</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <p><strong>Correo:</strong> {{ cotizacion.correo }}</p>
+        </div>
+        <div class="col-md-4">
+          <p><strong>Dirección:</strong> {{ cotizacion.direccion }}</p>
+        </div>
+        <div class="col-md-4">
+          <p><strong>Teléfono:</strong> {{ cotizacion.telefono }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de Productos -->
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead class="table-light">
+        <tr>
+          <th>Código</th>
+          <th>Máquina</th>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Tiempo Unitario</th>
+          <th>Tiempo Total</th>
+          <th>Precio Unitario</th>
+          <th>Precio Total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of cotizacion.productos">
+          <td>{{ p.codigo }}</td>
+          <td>{{ p.maquina }}</td>
+          <td>{{ p.nombre }}</td>
+          <td>{{ p.cantidad }}</td>
+          <td>{{ p.tiempoUnitario }}</td>
+          <td>{{ p.tiempoTotal }}</td>
+          <td>{{ p.precioUnitario | currency }}</td>
+          <td>{{ p.precioTotal | currency }}</td>
+          <td>
+            <button class="btn btn-danger btn-sm" (click)="eliminarProducto(p)">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <button
+    type="button"
+    class="btn btn-outline-primary mt-2"
+    (click)="abrirAgregarProducto()">
+    Agregar Producto
+  </button>
+</div>
+
+  <!-- Paso 3 -->
+  <div *ngIf="paso === 3">
+    <h5>Resumen Final</h5>
+    <pre>{{ cotizacion | json }}</pre>
+  </div>
+
+  <!-- Navegación -->
+  <div class="mt-4 d-flex justify-content-between">
+    <button
+      *ngIf="paso > 1"
+      type="button"
+      class="btn btn-secondary"
+      (click)="anteriorPaso()">
+      Atrás
+    </button>
+    <button
+      *ngIf="paso < 3"
+      type="button"
+      class="btn btn-primary ms-auto"
+      [disabled]="paso === 1 && !formularioValido()"
+      (click)="siguientePaso()">
+      Siguiente
+    </button>
+    <button
+      *ngIf="paso === 3"
+      type="button"
+      class="btn btn-success ms-auto"
+      (click)="guardarCotizacion()">
+      Generar Cotización
+    </button>
+  </div>
+</div>
+
+<!-- Modal agregar producto -->
+<div
+  class="modal fade"
+  id="modalAgregarProducto"
+  tabindex="-1"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-4">
+      <h5 class="mb-3">Agregar Producto</h5>
+      <div class="mb-3">
+        <label class="form-label">Producto</label>
+        <select
+          class="form-select"
+          [(ngModel)]="productoSeleccionado.nombre">
+          <option [ngValue]="''">Seleccione</option>
+          <option *ngFor="let prod of productosDisponibles" [ngValue]="prod.nombre">
+            {{ prod.nombre }}
+          </option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Cantidad</label>
+        <input
+          type="number"
+          class="form-control"
+          min="1"
+          [(ngModel)]="productoSeleccionado.cantidad"/>
+      </div>
+      <div class="d-flex justify-content-end mt-3">
+        <button
+          type="button"
+          class="btn btn-secondary me-2"
+          data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="agregarProducto()">
+          Agregar Producto
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
