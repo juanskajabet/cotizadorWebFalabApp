@@ -50,12 +50,8 @@ export class ProductoDialogo {
   cargarTiposMaquina() {
     this.http.get<TipoMaquina[]>(`${this.apiUrl}/tipos-maquina`)
       .subscribe({
-        next: (response) => {
-          this.maquinas = response;
-        },
-        error: (error) => {
-          console.error('Error cargando tipos de máquina:', error);
-        }
+        next: (response) => this.maquinas = response,
+        error: (error) => console.error('Error cargando tipos de máquina:', error)
       });
   }
 
@@ -76,9 +72,7 @@ export class ProductoDialogo {
           }));
           this.materialesFiltrados = this.materiales;
         },
-        error: (error) => {
-          console.error('Error cargando materiales:', error);
-        }
+        error: (error) => console.error('Error cargando materiales:', error)
       });
   }
 
@@ -122,7 +116,12 @@ export class ProductoDialogo {
   }
 
   onCantidadChange() {
+    if (this.esLAS) return; // En láser no hay cantidad
     this.calcularCostoYPrecio();
+  }
+
+  onDimensionChange() {
+    if (this.esLAS) this.calcularCostoYPrecio();
   }
 
   actualizarTiempoTotal() {
@@ -139,15 +138,13 @@ export class ProductoDialogo {
   }
 
   calcularCostoYPrecio() {
-    if (!this.producto?.cantidadMaterial || !this.producto?.idMaterial) {
+    if (!this.producto?.idMaterial) {
       this.producto.costoMaterial = 0;
       this.producto.precio = 0;
       return;
     }
 
-    const material = this.materiales.find(
-      m => m.IdMaterial === this.producto.idMaterial
-    );
+    const material = this.materiales.find(m => m.IdMaterial === this.producto.idMaterial);
     if (!material) {
       this.producto.costoMaterial = 0;
       this.producto.precio = 0;
@@ -155,65 +152,86 @@ export class ProductoDialogo {
     }
 
     const maquina = this.maquinas.find(m => m.IdTipoMaquina === material.IdTipoMaquina);
-    const esFilamento = maquina?.CodigoMaquina === 'FDA';
-    const esResina = maquina?.CodigoMaquina === 'SDA';
+    const codigoMaquina = maquina?.CodigoMaquina;
 
-    if (esFilamento || esResina) {
+    if (codigoMaquina === 'FDA' || codigoMaquina === 'SDA') {
+      // Filamento y Resina
       this.http.get<any>(`${this.apiUrl}/parametros-costo/buscar/material/${material.IdMaterial}`)
         .subscribe({
           next: (res) => {
             if (res.data && res.data.length > 0) {
-              const registro = res.data[0];
-              const costoPorGr = registro.CostoPorGr ?? 0;
-              const alquilerHora = registro.AlquilerHora ?? 0;
+              const r = res.data[0];
+              const costoPorGr = r.CostoPorGr ?? 0;
+              const alquilerHora = r.AlquilerHora ?? 0;
 
               const calculado = this.producto.cantidadMaterial * costoPorGr;
               const redondeado = Math.round(calculado * 1000) / 1000;
               this.producto.costoMaterial = redondeado;
 
-              // Horas totales desde tiempoTotal
-              let horasTotales = 0;
-              if (this.producto.tiempoTotal) {
-                const partes = this.producto.tiempoTotal.match(/(\d+)h\s+(\d+)m/);
-                if (partes) {
-                  const h = parseInt(partes[1], 10);
-                  const m = parseInt(partes[2], 10);
-                  horasTotales = h + m / 60;
-                }
-              }
-
+              const horasTotales = this.obtenerHorasTotales();
               const parcial = (horasTotales * alquilerHora) + (redondeado * 1.2);
-              const precio = +(parcial * 1.24).toFixed(3);
-
-              this.producto.precio = precio;
-
-              console.log(
-                `Precio = ((${horasTotales}h * ${alquilerHora}) + (${redondeado} * 1.2)) * 1.24 = ${precio}`
-              );
-            } else {
-              this.producto.costoMaterial = 0;
-              this.producto.precio = 0;
+              this.producto.precio = +(parcial * 1.24).toFixed(3);
             }
-          },
-          error: () => {
-            this.producto.costoMaterial = 0;
-            this.producto.precio = 0;
           }
         });
+    } else if (codigoMaquina === 'LAS') {
+      // Láser
+      this.http.get<any>(`${this.apiUrl}/parametros-costo/buscar/material/${material.IdMaterial}`)
+        .subscribe({
+          next: (res) => {
+            if (res.data && res.data.length > 0) {
+              const r = res.data[0];
+              const costoPorM2 = r.CostoPorM2 ?? 0;
+              const alquilerHora = r.AlquilerHora ?? 0;
+
+              const ancho = this.producto.ancho ?? 0;
+              const alto = this.producto.altura ?? 0;
+              const areaCm2 = ancho * alto;
+
+              const calculado = (areaCm2 * costoPorM2) / 10000;
+              const redondeado = Math.round(calculado * 1000) / 1000;
+              this.producto.costoMaterial = redondeado;
+
+              const horasTotales = this.obtenerHorasTotales();
+              const parcial = (horasTotales * alquilerHora) + (redondeado * 1.2);
+              this.producto.precio = +(parcial * 1.24).toFixed(3);
+            }
+          }
+        });
+    } else {
+      this.producto.costoMaterial = 0;
+      this.producto.precio = 0;
     }
   }
 
-  get esFDA(): boolean {
-    const maquina = this.maquinas.find(m => m.IdTipoMaquina === this.producto?.idTipoMaquina);
-    return maquina?.CodigoMaquina === 'FDA';
+  private obtenerHorasTotales(): number {
+    let horasTotales = 0;
+    if (this.producto.tiempoTotal) {
+      const partes = this.producto.tiempoTotal.match(/(\d+)h\s+(\d+)m/);
+      if (partes) {
+        const h = parseInt(partes[1], 10);
+        const m = parseInt(partes[2], 10);
+        horasTotales = h + m / 60;
+      }
+    }
+    return horasTotales;
   }
-  get esSDA(): boolean {
-    const maquina = this.maquinas.find(m => m.IdTipoMaquina === this.producto?.idTipoMaquina);
-    return maquina?.CodigoMaquina === 'SDA';
+
+  get esFDA() {
+    const m = this.maquinas.find(x => x.IdTipoMaquina === this.producto?.idTipoMaquina);
+    return m?.CodigoMaquina === 'FDA';
   }
-  get esSUB(): boolean {
-    const maquina = this.maquinas.find(m => m.IdTipoMaquina === this.producto?.idTipoMaquina);
-    return maquina?.CodigoMaquina === 'SUB';
+  get esSDA() {
+    const m = this.maquinas.find(x => x.IdTipoMaquina === this.producto?.idTipoMaquina);
+    return m?.CodigoMaquina === 'SDA';
+  }
+  get esLAS() {
+    const m = this.maquinas.find(x => x.IdTipoMaquina === this.producto?.idTipoMaquina);
+    return m?.CodigoMaquina === 'LAS';
+  }
+  get esSUB() {
+    const m = this.maquinas.find(x => x.IdTipoMaquina === this.producto?.idTipoMaquina);
+    return m?.CodigoMaquina === 'SUB';
   }
 
   guardarProducto() {

@@ -42,7 +42,9 @@
           <label class="form-label">Altura</label>
           <div class="input-group">
             <input type="number" class="form-control" min="0" step="0.01"
-                   [(ngModel)]="producto.altura" name="altura" />
+                   [(ngModel)]="producto.altura"
+                   name="altura"
+                   (ngModelChange)="onDimensionChange()" />
             <span class="input-group-text">cm</span>
           </div>
         </div>
@@ -50,7 +52,9 @@
           <label class="form-label">Ancho</label>
           <div class="input-group">
             <input type="number" class="form-control" min="0" step="0.01"
-                   [(ngModel)]="producto.ancho" name="ancho" />
+                   [(ngModel)]="producto.ancho"
+                   name="ancho"
+                   (ngModelChange)="onDimensionChange()" />
             <span class="input-group-text">cm</span>
           </div>
         </div>
@@ -58,7 +62,8 @@
           <label class="form-label">Profundidad</label>
           <div class="input-group">
             <input type="number" class="form-control" min="0" step="0.01"
-                   [(ngModel)]="producto.profundidad" name="profundidad" />
+                   [(ngModel)]="producto.profundidad"
+                   name="profundidad" />
             <span class="input-group-text">cm</span>
           </div>
         </div>
@@ -95,7 +100,8 @@
       <!-- Material -->
       <h6 class="fw-bold mt-4">Material</h6>
       <div class="row g-3">
-        <div class="col-md-4" *ngIf="!esSUB">
+        <!-- Oculta Cantidad si es Láser -->
+        <div class="col-md-4" *ngIf="!esSUB && !esLAS">
           <label class="form-label">Cantidad</label>
           <input type="number" class="form-control" min="0" step="0.01"
                  [(ngModel)]="producto.cantidadMaterial"
@@ -109,7 +115,7 @@
             <input type="number" class="form-control" min="0" step="0.01"
                    [(ngModel)]="producto.costoMaterial"
                    name="costoMaterial"
-                   [readonly]="esFDA || esSDA" />
+                   [readonly]="esFDA || esSDA || esLAS" />
           </div>
         </div>
         <div class="col-md-4" *ngIf="esSUB">
