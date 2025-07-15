@@ -11,7 +11,7 @@
         <div class="col-md-4">
           <label class="form-label">Máquina</label>
           <select class="form-select" [(ngModel)]="producto.idTipoMaquina" name="idTipoMaquina"
-            (change)="onMaquinaChange()" [disabled]="!esNuevoProducto">
+                  (change)="onMaquinaChange()" [disabled]="!esNuevoProducto">
             <option [ngValue]="undefined">Seleccione máquina</option>
             <option *ngFor="let m of maquinas" [ngValue]="m.IdTipoMaquina">
               {{ m.Nombre }} ({{ m.CodigoMaquina }})
@@ -20,7 +20,8 @@
         </div>
         <div class="col-md-4">
           <label class="form-label">Material</label>
-          <select class="form-select" [(ngModel)]="producto.idMaterial" name="idMaterial" (change)="onMaterialChange()">
+          <select class="form-select" [(ngModel)]="producto.idMaterial" name="idMaterial"
+                  (change)="onMaterialChange()">
             <option [ngValue]="undefined">Seleccione material</option>
             <option *ngFor="let mat of materialesFiltrados" [ngValue]="mat.IdMaterial">
               {{ mat.NombreMaterial }} ({{ mat.CodigoMaterial }})
@@ -34,29 +35,30 @@
         <input type="text" class="form-control" [(ngModel)]="producto.producto" name="descripcion" />
       </div>
 
-      <!-- Parámetros Dimensiones -->
+      <!-- Dimensiones -->
       <h6 class="fw-bold mt-4">Dimensiones</h6>
       <div class="row g-3">
         <div class="col-md-4">
           <label class="form-label">Altura</label>
           <div class="input-group">
-            <input type="number" class="form-control" min="0" step="0.01" [(ngModel)]="producto.altura" name="altura" />
+            <input type="number" class="form-control" min="0" step="0.01"
+                   [(ngModel)]="producto.altura" name="altura" />
             <span class="input-group-text">cm</span>
           </div>
         </div>
         <div class="col-md-4">
           <label class="form-label">Ancho</label>
           <div class="input-group">
-            <input type="number" class="form-control" min="0" step="0.01" [(ngModel)]="producto.ancho" name="ancho" />
+            <input type="number" class="form-control" min="0" step="0.01"
+                   [(ngModel)]="producto.ancho" name="ancho" />
             <span class="input-group-text">cm</span>
           </div>
         </div>
-        <!-- Profundidad: Solo FDA o SDA -->
-        <div class="col-md-4" *ngIf="producto?.idTipoMaquina === 1 || producto?.idTipoMaquina === 2">
+        <div class="col-md-4" *ngIf="esFDA || esSDA">
           <label class="form-label">Profundidad</label>
           <div class="input-group">
-            <input type="number" class="form-control" min="0" step="0.01" [(ngModel)]="producto.profundidad"
-              name="profundidad" />
+            <input type="number" class="form-control" min="0" step="0.01"
+                   [(ngModel)]="producto.profundidad" name="profundidad" />
             <span class="input-group-text">cm</span>
           </div>
         </div>
@@ -65,52 +67,58 @@
       <!-- Tiempos -->
       <h6 class="fw-bold mt-4">Tiempos</h6>
       <div class="row g-3">
-        <!-- Horas: ocultar si Sublimadora -->
-        <div class="col-md-3" *ngIf="producto?.idTipoMaquina !== 5">
+        <div class="col-md-3" *ngIf="!esSUB">
           <label class="form-label">Horas</label>
-          <input type="number" class="form-control" min="0" step="1" [(ngModel)]="producto.horas" name="horas"
-            (ngModelChange)="actualizarTiempoTotal()" />
+          <input type="number" class="form-control" min="0" step="1"
+                 [(ngModel)]="producto.horas" name="horas"
+                 (ngModelChange)="actualizarTiempoTotal()" />
         </div>
         <div class="col-md-3">
           <label class="form-label">Minutos</label>
-          <input type="number" class="form-control" min="0" step="1" [(ngModel)]="producto.minutos" name="minutos"
-            (ngModelChange)="actualizarTiempoTotal()" />
+          <input type="number" class="form-control" min="0" step="1"
+                 [(ngModel)]="producto.minutos" name="minutos"
+                 (ngModelChange)="actualizarTiempoTotal()" />
         </div>
         <div class="col-md-3">
           <label class="form-label">Post Procesamiento</label>
-          <input type="text" class="form-control" [(ngModel)]="producto.tiempoPostProceso" name="postProceso"
-            readonly />
+          <input type="text" class="form-control"
+                 [(ngModel)]="producto.tiempoPostProceso" name="postProceso"
+                 readonly />
         </div>
         <div class="col-md-3">
           <label class="form-label">Total</label>
-          <input type="text" class="form-control" [value]="producto.tiempoTotal" readonly />
+          <input type="text" class="form-control"
+                 [value]="producto.tiempoTotal" readonly />
         </div>
       </div>
 
       <!-- Material -->
       <h6 class="fw-bold mt-4">Material</h6>
       <div class="row g-3">
-        <!-- Cantidad: Ocultar si Sublimadora -->
-        <div class="col-md-4" *ngIf="producto?.idTipoMaquina !== 5">
+        <div class="col-md-4" *ngIf="!esSUB">
           <label class="form-label">Cantidad</label>
-          <input type="number" class="form-control" min="0" step="0.01" [(ngModel)]="producto.cantidadMaterial"
-            name="cantidadMaterial" />
+          <input type="number" class="form-control" min="0" step="0.01"
+                 [(ngModel)]="producto.cantidadMaterial"
+                 name="cantidadMaterial"
+                 (ngModelChange)="onCantidadChange()" />
         </div>
         <div class="col-md-4">
           <label class="form-label">Costo</label>
           <div class="input-group">
             <span class="input-group-text">$</span>
-            <input type="number" class="form-control" min="0" step="0.01" [(ngModel)]="producto.costoMaterial"
-              name="costoMaterial" />
+            <input type="number" class="form-control" min="0" step="0.01"
+                   [(ngModel)]="producto.costoMaterial"
+                   name="costoMaterial"
+                   [readonly]="esFDA || esSDA" />
           </div>
         </div>
-        <!-- Costo Sublimación solo Sublimadora -->
-        <div class="col-md-4" *ngIf="producto?.idTipoMaquina === 5">
+        <div class="col-md-4" *ngIf="esSUB">
           <label class="form-label">Costo Sublimación</label>
           <div class="input-group">
             <span class="input-group-text">$</span>
-            <input type="number" class="form-control" min="0" step="0.01" [(ngModel)]="producto.costoSublimacion"
-              name="costoSublimacion" />
+            <input type="number" class="form-control" min="0" step="0.01"
+                   [(ngModel)]="producto.costoSublimacion"
+                   name="costoSublimacion" />
           </div>
         </div>
       </div>
@@ -121,7 +129,8 @@
         <label class="form-label">Precio</label>
         <div class="input-group">
           <span class="input-group-text">$</span>
-          <input type="number" class="form-control" [value]="producto.precio" readonly />
+          <input type="number" class="form-control"
+                 [value]="producto.precio" readonly />
         </div>
       </div>
 
@@ -133,7 +142,6 @@
         <button type="button" class="btn btn-primary" (click)="guardarProducto()">
           Guardar
         </button>
-
       </div>
     </form>
   </div>

@@ -35,8 +35,6 @@ export class ProductoDialogo {
   @Input() key?: string | number;
   @Output() productoGuardado = new EventEmitter<void>();
 
-
-
   maquinas: TipoMaquina[] = [];
   materiales: Material[] = [];
   materialesFiltrados: Material[] = [];
@@ -100,97 +98,156 @@ export class ProductoDialogo {
     this.materialesFiltrados = this.materiales.filter(
       m => m.IdTipoMaquina === this.producto.idTipoMaquina
     );
-    const materialActual = this.materialesFiltrados.find(
-      m => m.IdMaterial === this.producto.idMaterial
-    );
-    if (!materialActual) {
-      this.producto.idMaterial = undefined;
-    }
+
+    // Limpiar selección de material y cantidad
+    this.producto.idMaterial = undefined;
+    this.producto.cantidadMaterial = 0;
+
+    // Reiniciar costo y tiempo post procesamiento
+    this.producto.costoMaterial = 0;
+    this.producto.tiempoPostProceso = '00:00:00';
+    this.actualizarTiempoTotal();
   }
 
   onMaterialChange() {
     const material = this.materiales.find(
       m => m.IdMaterial === this.producto.idMaterial
     );
+
     if (material) {
       this.producto.idTipoMaquina = material.IdTipoMaquina;
-      this.onMaquinaChange();
+      this.materialesFiltrados = this.materiales.filter(
+        m => m.IdTipoMaquina === this.producto.idTipoMaquina
+      );
+
+      // Reiniciar cantidad, costo y tiempo
+      this.producto.cantidadMaterial = 0;
+      this.producto.costoMaterial = 0;
+      this.producto.tiempoPostProceso = '00:00:00';
+
+      this.actualizarTiempoTotal();
     }
   }
-get esFDA(): boolean { return this.producto?.idTipoMaquina === 1; }
-get esSDA(): boolean { return this.producto?.idTipoMaquina === 2; }
-get esLAS(): boolean { return this.producto?.idTipoMaquina === 3; }
-get esSUB(): boolean { return this.producto?.idTipoMaquina === 5; }
 
-guardarProducto() {
-  if (!this.producto?.idTipoMaquina || !this.producto?.idMaterial || !this.producto?.producto) {
-    alert('Por favor, seleccione máquina, material y descripción.');
-    return;
+  onCantidadChange() {
+    if (!this.producto?.cantidadMaterial || !this.producto?.idMaterial) {
+      this.producto.costoMaterial = 0;
+      return;
+    }
+
+    const material = this.materiales.find(
+      m => m.IdMaterial === this.producto.idMaterial
+    );
+    if (!material) {
+      this.producto.costoMaterial = 0;
+      return;
+    }
+
+    // Detectar si la máquina es filamento o resina por su CódigoMaquina
+    const maquina = this.maquinas.find(m => m.IdTipoMaquina === material.IdTipoMaquina);
+    const esFilamento = maquina?.CodigoMaquina === 'FDA';
+    const esResina = maquina?.CodigoMaquina === 'SDA';
+
+    if (esFilamento || esResina) {
+      // Obtener CostoPorGr de la API
+      this.http.get<any>(`${this.apiUrl}/parametros-costo/buscar/material/${material.IdMaterial}`)
+        .subscribe({
+          next: (res) => {
+            if (res.data && res.data.length > 0) {
+              const costoPorGr = res.data[0].CostoPorGr ?? 0;
+              const calculado = this.producto.cantidadMaterial * costoPorGr;
+              this.producto.costoMaterial = Math.round(calculado * 100) / 100;
+            } else {
+              this.producto.costoMaterial = 0;
+            }
+          },
+          error: () => {
+            this.producto.costoMaterial = 0;
+          }
+        });
+    }
   }
 
-  const tipo = this.producto.idTipoMaquina;
+  get esFDA(): boolean {
+    const maquina = this.maquinas.find(m => m.IdTipoMaquina === this.producto?.idTipoMaquina);
+    return maquina?.CodigoMaquina === 'FDA';
+  }
 
-  const payload = {
-    IdMaterial: this.producto.idMaterial,
-    NombreProducto: this.producto.producto,
-    AlturaCm: (tipo !== 5 ? this.producto.altura : null),
-    AnchoCm: (tipo !== 5 ? this.producto.ancho : null),
-    ProfundidadCm: (tipo === 1 || tipo === 2) ? this.producto.profundidad : null,
-    Horas: (tipo === 5 ? null : this.producto.horas),
-    Minutos: this.producto.minutos,
-    TiempoPostProceso: this.producto.tiempoPostProceso,
-    TiempoTotal: this.convertirTiempoTotal(this.producto.tiempoTotal),
-    CantidadMaterialGr: (tipo !== 5 ? this.producto.cantidadMaterial : null),
-    CostoMaterial: this.producto.costoMaterial,
-    CostoSublimacion: (tipo === 5 ? this.producto.costoSublimacion : null),
-    Precio: 20
-  };
+  get esSDA(): boolean {
+    const maquina = this.maquinas.find(m => m.IdTipoMaquina === this.producto?.idTipoMaquina);
+    return maquina?.CodigoMaquina === 'SDA';
+  }
 
-  this.http.post(`${this.apiUrl}/producto/agregar`, payload).subscribe({
-    next: () => {
-      this.mostrarAlertaExito();
-      // Cerrar modal
-      const modalElement = document.getElementById('modalAgregarProducto');
-      if (modalElement) {
-        const modal = bootstrap.Modal.getInstance(modalElement);
-        modal?.hide();
-         this.productoGuardado.emit();
+  get esSUB(): boolean {
+    const maquina = this.maquinas.find(m => m.IdTipoMaquina === this.producto?.idTipoMaquina);
+    return maquina?.CodigoMaquina === 'SUB';
+  }
+
+  guardarProducto() {
+    if (!this.producto?.idTipoMaquina || !this.producto?.idMaterial || !this.producto?.producto) {
+      alert('Por favor, seleccione máquina, material y descripción.');
+      return;
+    }
+
+    const payload = {
+      IdMaterial: this.producto.idMaterial,
+      NombreProducto: this.producto.producto,
+      AlturaCm: this.producto.altura,
+      AnchoCm: this.producto.ancho,
+      ProfundidadCm: this.producto.profundidad,
+      Horas: this.producto.horas,
+      Minutos: this.producto.minutos,
+      TiempoPostProceso: this.producto.tiempoPostProceso,
+      TiempoTotal: this.convertirTiempoTotal(this.producto.tiempoTotal),
+      CantidadMaterialGr: this.producto.cantidadMaterial,
+      CostoMaterial: this.producto.costoMaterial,
+      CostoSublimacion: this.producto.costoSublimacion,
+      Precio: 20
+    };
+
+    const esEdicion = !!this.producto?.idProducto;
+
+    const peticion = esEdicion
+      ? this.http.put(`${this.apiUrl}/producto/actualizar/${this.producto.idProducto}`, payload)
+      : this.http.post(`${this.apiUrl}/producto/agregar`, payload);
+
+    peticion.subscribe({
+      next: () => {
+        this.mostrarAlertaExito(esEdicion ? 'editado' : 'creado');
+        const modalElement = document.getElementById('modalAgregarProducto');
+        if (modalElement) {
+          const modal = bootstrap.Modal.getInstance(modalElement);
+          modal?.hide();
+          this.productoGuardado.emit();
+        }
+      },
+      error: (err) => {
+        console.error('Error al guardar:', err);
+        alert('Ocurrió un error al guardar el producto.');
       }
-    },
-    error: (err) => {
-      console.error('Error al guardar:', err);
-      alert('Ocurrió un error al guardar el producto.');
-    }
-  });
-}
+    });
+  }
 
-private mostrarAlertaExito() {
-  const alert = document.createElement('div');
-  alert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3';
-  alert.role = 'alert';
-  alert.innerHTML = `
-    <strong>¡Éxito!</strong> Registro ingresado correctamente.
-  `;
-  document.body.appendChild(alert);
+  private mostrarAlertaExito(accion: 'creado' | 'editado') {
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3';
+    alert.role = 'alert';
+    alert.innerHTML = `<strong>¡Éxito!</strong> Producto ${accion} correctamente.`;
+    document.body.appendChild(alert);
 
-  setTimeout(() => {
-    alert.classList.remove('show');
-    alert.classList.add('hide');
-    setTimeout(() => alert.remove(), 300);
-  }, 3000);
-}
+    setTimeout(() => {
+      alert.classList.remove('show');
+      alert.classList.add('hide');
+      setTimeout(() => alert.remove(), 300);
+    }, 3000);
+  }
 
-private convertirTiempoTotal(texto: string): string {
-  if (!texto) return '00:00:00';
-
-  const partes = texto.match(/(\d+)h\s+(\d+)m/);
-  if (!partes) return '00:00:00';
-
-  const horas = partes[1].padStart(2, '0');
-  const minutos = partes[2].padStart(2, '0');
-  return `${horas}:${minutos}:00`;
-}
-
-
-
+  private convertirTiempoTotal(texto: string): string {
+    if (!texto) return '00:00:00';
+    const partes = texto.match(/(\d+)h\s+(\d+)m/);
+    if (!partes) return '00:00:00';
+    const horas = partes[1].padStart(2, '0');
+    const minutos = partes[2].padStart(2, '0');
+    return `${horas}:${minutos}:00`;
+  }
 }
