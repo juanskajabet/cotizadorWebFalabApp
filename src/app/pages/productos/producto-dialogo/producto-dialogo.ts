@@ -47,18 +47,6 @@ export class ProductoDialogo {
     this.cargarMateriales();
   }
 
-  actualizarTiempoTotal() {
-    const horas = this.producto?.horas ?? 0;
-    const minutos = this.producto?.minutos ?? 0;
-    const totalMinutos = horas * 60 + minutos;
-    const [ppH, ppM] = this.producto?.tiempoPostProceso?.split(':') ?? ['0', '0'];
-    const postProcesoMin = (+ppH) * 60 + (+ppM);
-    const total = totalMinutos + postProcesoMin;
-    const totalHoras = Math.floor(total / 60);
-    const totalRestMin = total % 60;
-    this.producto.tiempoTotal = `${totalHoras}h ${totalRestMin}m`;
-  }
-
   cargarTiposMaquina() {
     this.http.get<TipoMaquina[]>(`${this.apiUrl}/tipos-maquina`)
       .subscribe({
@@ -99,11 +87,8 @@ export class ProductoDialogo {
       m => m.IdTipoMaquina === this.producto.idTipoMaquina
     );
 
-    // Limpiar selección de material y cantidad
     this.producto.idMaterial = undefined;
     this.producto.cantidadMaterial = 0;
-
-    // Reiniciar costo y tiempo post procesamiento
     this.producto.costoMaterial = 0;
     this.producto.tiempoPostProceso = '00:00:00';
     this.actualizarTiempoTotal();
@@ -120,18 +105,43 @@ export class ProductoDialogo {
         m => m.IdTipoMaquina === this.producto.idTipoMaquina
       );
 
-      // Reiniciar cantidad, costo y tiempo
+      this.http.get<any>(`${this.apiUrl}/parametros-costo/buscar/material/${material.IdMaterial}`)
+        .subscribe({
+          next: (res) => {
+            if (res.data && res.data.length > 0) {
+              const registro = res.data[0];
+              this.producto.tiempoPostProceso = registro.TiempoPostProc ?? '00:00:00';
+              this.actualizarTiempoTotal();
+            }
+          }
+        });
+
       this.producto.cantidadMaterial = 0;
       this.producto.costoMaterial = 0;
-      this.producto.tiempoPostProceso = '00:00:00';
-
-      this.actualizarTiempoTotal();
     }
   }
 
   onCantidadChange() {
+    this.calcularCostoYPrecio();
+  }
+
+  actualizarTiempoTotal() {
+    const horas = this.producto?.horas ?? 0;
+    const minutos = this.producto?.minutos ?? 0;
+    const totalMinutos = horas * 60 + minutos;
+    const [ppH, ppM] = this.producto?.tiempoPostProceso?.split(':') ?? ['0', '0'];
+    const postProcesoMin = (+ppH) * 60 + (+ppM);
+    const total = totalMinutos + postProcesoMin;
+    const totalHoras = Math.floor(total / 60);
+    const totalRestMin = total % 60;
+    this.producto.tiempoTotal = `${totalHoras}h ${totalRestMin}m`;
+    this.calcularCostoYPrecio();
+  }
+
+  calcularCostoYPrecio() {
     if (!this.producto?.cantidadMaterial || !this.producto?.idMaterial) {
       this.producto.costoMaterial = 0;
+      this.producto.precio = 0;
       return;
     }
 
@@ -140,29 +150,54 @@ export class ProductoDialogo {
     );
     if (!material) {
       this.producto.costoMaterial = 0;
+      this.producto.precio = 0;
       return;
     }
 
-    // Detectar si la máquina es filamento o resina por su CódigoMaquina
     const maquina = this.maquinas.find(m => m.IdTipoMaquina === material.IdTipoMaquina);
     const esFilamento = maquina?.CodigoMaquina === 'FDA';
     const esResina = maquina?.CodigoMaquina === 'SDA';
 
     if (esFilamento || esResina) {
-      // Obtener CostoPorGr de la API
       this.http.get<any>(`${this.apiUrl}/parametros-costo/buscar/material/${material.IdMaterial}`)
         .subscribe({
           next: (res) => {
             if (res.data && res.data.length > 0) {
-              const costoPorGr = res.data[0].CostoPorGr ?? 0;
+              const registro = res.data[0];
+              const costoPorGr = registro.CostoPorGr ?? 0;
+              const alquilerHora = registro.AlquilerHora ?? 0;
+
               const calculado = this.producto.cantidadMaterial * costoPorGr;
-              this.producto.costoMaterial = Math.round(calculado * 100) / 100;
+              const redondeado = Math.round(calculado * 1000) / 1000;
+              this.producto.costoMaterial = redondeado;
+
+              // Horas totales desde tiempoTotal
+              let horasTotales = 0;
+              if (this.producto.tiempoTotal) {
+                const partes = this.producto.tiempoTotal.match(/(\d+)h\s+(\d+)m/);
+                if (partes) {
+                  const h = parseInt(partes[1], 10);
+                  const m = parseInt(partes[2], 10);
+                  horasTotales = h + m / 60;
+                }
+              }
+
+              const parcial = (horasTotales * alquilerHora) + (redondeado * 1.2);
+              const precio = +(parcial * 1.24).toFixed(3);
+
+              this.producto.precio = precio;
+
+              console.log(
+                `Precio = ((${horasTotales}h * ${alquilerHora}) + (${redondeado} * 1.2)) * 1.24 = ${precio}`
+              );
             } else {
               this.producto.costoMaterial = 0;
+              this.producto.precio = 0;
             }
           },
           error: () => {
             this.producto.costoMaterial = 0;
+            this.producto.precio = 0;
           }
         });
     }
@@ -172,12 +207,10 @@ export class ProductoDialogo {
     const maquina = this.maquinas.find(m => m.IdTipoMaquina === this.producto?.idTipoMaquina);
     return maquina?.CodigoMaquina === 'FDA';
   }
-
   get esSDA(): boolean {
     const maquina = this.maquinas.find(m => m.IdTipoMaquina === this.producto?.idTipoMaquina);
     return maquina?.CodigoMaquina === 'SDA';
   }
-
   get esSUB(): boolean {
     const maquina = this.maquinas.find(m => m.IdTipoMaquina === this.producto?.idTipoMaquina);
     return maquina?.CodigoMaquina === 'SUB';
@@ -202,11 +235,10 @@ export class ProductoDialogo {
       CantidadMaterialGr: this.producto.cantidadMaterial,
       CostoMaterial: this.producto.costoMaterial,
       CostoSublimacion: this.producto.costoSublimacion,
-      Precio: 20
+      Precio: this.producto.precio
     };
 
     const esEdicion = !!this.producto?.idProducto;
-
     const peticion = esEdicion
       ? this.http.put(`${this.apiUrl}/producto/actualizar/${this.producto.idProducto}`, payload)
       : this.http.post(`${this.apiUrl}/producto/agregar`, payload);
