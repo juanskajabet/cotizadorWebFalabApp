@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { EventEmitter, Output } from '@angular/core';
+import { environment } from  '../../../../environments/environments';
+
 
 declare var bootstrap: any;
 
@@ -40,7 +42,7 @@ export class ProductoDialogo {
   materialesFiltrados: Material[] = [];
   esNuevoProducto = true;
 
-  private apiUrl = 'http://127.0.0.1:8000/api';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {
     this.cargarTiposMaquina();

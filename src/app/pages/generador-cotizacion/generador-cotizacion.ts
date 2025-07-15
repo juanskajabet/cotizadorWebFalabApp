@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { environment } from  '../../../environments/environments';
 
 declare var bootstrap: any;
 
@@ -40,13 +41,14 @@ export class GeneradorCotizacion {
 
   // Control de estado final
   cotizacionFinalizada = false;
+   private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {
     this.cargarProductos();
   }
 
   cargarProductos() {
-    this.http.get<any>('http://127.0.0.1:8000/api/producto/precios').subscribe({
+    this.http.get<any>(`${this.apiUrl}/producto/precios`).subscribe({
       next: (res) => {
         this.productosDisponibles = res.data || [];
       },
@@ -185,7 +187,7 @@ export class GeneradorCotizacion {
   }
 
   obtenerNumeroFactura() {
-    this.http.get<any>('http://127.0.0.1:8000/api/cotizaciones/ultima')
+    this.http.get<any>(`${this.apiUrl}/cotizaciones/ultima`)
       .subscribe({
         next: (res) => {
           if (res.data?.CodigoCotizacion) {
@@ -216,7 +218,7 @@ export class GeneradorCotizacion {
       Telefono: this.cotizacion.telefono
     };
 
-    this.http.post<any>('http://127.0.0.1:8000/api/cotizaciones', cabecera)
+    this.http.post<any>(`${this.apiUrl}/cotizaciones`, cabecera)
       .subscribe({
         next: (res) => {
           this.idCotizacionGenerada = res.data?.IdCotizacion;
@@ -227,7 +229,7 @@ export class GeneradorCotizacion {
           }
 
           const detalleRequests = this.cotizacion.productos.map(p =>
-            this.http.post(`http://127.0.0.1:8000/api/cotizaciones/${this.idCotizacionGenerada}/detalle`, {
+            this.http.post(`${this.apiUrl}/cotizaciones/${this.idCotizacionGenerada}/detalle`, {
               CodigoProducto: p.codigo,
               Cantidad: p.cantidad
             })
