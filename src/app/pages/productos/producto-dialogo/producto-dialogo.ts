@@ -143,7 +143,6 @@ calcularCostoYPrecio() {
   if (!this.producto?.idMaterial) {
     this.producto.costoMaterial = 0;
     this.producto.precio = 0;
-    this.producto.costoSublimacion = 0;
     return;
   }
 
@@ -151,7 +150,6 @@ calcularCostoYPrecio() {
   if (!material) {
     this.producto.costoMaterial = 0;
     this.producto.precio = 0;
-    this.producto.costoSublimacion = 0;
     return;
   }
 
@@ -222,14 +220,15 @@ calcularCostoYPrecio() {
             const ancho = this.producto.ancho ?? 0;
             const areaCm2 = largo * ancho;
 
-            const baseAreaCm2 = 623.7; // Ajuste final
+            const baseAreaCm2 = 623.7;
             const calculado = (costoUsoA4 * areaCm2) / baseAreaCm2;
             const redondeado = Math.round(calculado * 1000) / 1000;
 
             this.producto.costoSublimacion = redondeado;
 
-            // Precio: suma de ambos costos
-            this.producto.precio = +(redondeado + costoFijo).toFixed(3);
+            // Precio: (Costo Sublimación + Costo Material) * (1 + 0.24)
+            const sumaCostos = redondeado + costoFijo;
+            this.producto.precio = +(sumaCostos * 1.24).toFixed(3);
           }
         }
       });
@@ -237,10 +236,8 @@ calcularCostoYPrecio() {
   } else {
     this.producto.costoMaterial = 0;
     this.producto.precio = 0;
-    this.producto.costoSublimacion = 0;
   }
 }
-
   private obtenerHorasTotales(): number {
     let horasTotales = 0;
     if (this.producto.tiempoTotal) {

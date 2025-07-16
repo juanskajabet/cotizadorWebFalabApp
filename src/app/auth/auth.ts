@@ -8,7 +8,7 @@ export class Auth {
   private isLoggedIn = false;
 
   login(username: string, password: string): boolean {
-  if (username.trim() === 'a' && password.trim() === '1') {
+  if (username.trim() === 'fablab' && password.trim() === 'fablab') {
     this.isLoggedIn = true;
     return true;
   }

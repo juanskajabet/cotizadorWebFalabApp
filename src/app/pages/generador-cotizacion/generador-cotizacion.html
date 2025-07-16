@@ -1,12 +1,20 @@
 <div class="container my-4">
   <h2 class="mb-4">Nueva Cotización</h2>
 
-  <!-- Pasos -->
-  <div class="steps mb-4 d-flex justify-content-between">
-    <div [class.active]="paso === 1">1 Información Personal</div>
-    <div [class.active]="paso === 2">2 Selección de Productos</div>
-    <div [class.active]="paso === 3">3 Generación de Factura</div>
+<div class="steps mb-4 d-flex justify-content-between text-center">
+  <div class="step" [class.active]="paso === 1">
+    <span class="number">1</span>
+    <span class="label">Información Personal</span>
   </div>
+  <div class="step" [class.active]="paso === 2">
+    <span class="number">2</span>
+    <span class="label">Selección de Productos</span>
+  </div>
+  <div class="step" [class.active]="paso === 3">
+    <span class="number">3</span>
+    <span class="label">Generación de Factura</span>
+  </div>
+</div>
 
   <!-- Paso 1 -->
   <div *ngIf="paso === 1">
@@ -237,9 +245,9 @@
   </div>
 
   <!-- Notificación success -->
-  <div *ngIf="mostrarNotificacion" class="alert alert-success mt-3 text-center">
-    Cotización generada correctamente.
-  </div>
+<div *ngIf="mostrarNotificacion" class="custom-toast alert alert-success">
+  Cotización generada correctamente.
+</div>
 
   <!-- Navegación -->
   <div class="mt-4 d-flex justify-content-between">
