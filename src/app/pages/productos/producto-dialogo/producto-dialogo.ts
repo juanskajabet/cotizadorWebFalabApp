@@ -139,72 +139,107 @@ export class ProductoDialogo {
     this.calcularCostoYPrecio();
   }
 
-  calcularCostoYPrecio() {
-    if (!this.producto?.idMaterial) {
-      this.producto.costoMaterial = 0;
-      this.producto.precio = 0;
-      return;
-    }
-
-    const material = this.materiales.find(m => m.IdMaterial === this.producto.idMaterial);
-    if (!material) {
-      this.producto.costoMaterial = 0;
-      this.producto.precio = 0;
-      return;
-    }
-
-    const maquina = this.maquinas.find(m => m.IdTipoMaquina === material.IdTipoMaquina);
-    const codigoMaquina = maquina?.CodigoMaquina;
-
-    if (codigoMaquina === 'FDA' || codigoMaquina === 'SDA') {
-      // Filamento y Resina
-      this.http.get<any>(`${this.apiUrl}/parametros-costo/buscar/material/${material.IdMaterial}`)
-        .subscribe({
-          next: (res) => {
-            if (res.data && res.data.length > 0) {
-              const r = res.data[0];
-              const costoPorGr = r.CostoPorGr ?? 0;
-              const alquilerHora = r.AlquilerHora ?? 0;
-
-              const calculado = this.producto.cantidadMaterial * costoPorGr;
-              const redondeado = Math.round(calculado * 1000) / 1000;
-              this.producto.costoMaterial = redondeado;
-
-              const horasTotales = this.obtenerHorasTotales();
-              const parcial = (horasTotales * alquilerHora) + (redondeado * 1.2);
-              this.producto.precio = +(parcial * 1.24).toFixed(3);
-            }
-          }
-        });
-    } else if (codigoMaquina === 'LAS') {
-      // Láser
-      this.http.get<any>(`${this.apiUrl}/parametros-costo/buscar/material/${material.IdMaterial}`)
-        .subscribe({
-          next: (res) => {
-            if (res.data && res.data.length > 0) {
-              const r = res.data[0];
-              const costoPorM2 = r.CostoPorM2 ?? 0;
-              const alquilerHora = r.AlquilerHora ?? 0;
-
-              const ancho = this.producto.ancho ?? 0;
-              const alto = this.producto.altura ?? 0;
-              const areaCm2 = ancho * alto;
-
-              const calculado = (areaCm2 * costoPorM2) / 10000;
-              const redondeado = Math.round(calculado * 1000) / 1000;
-              this.producto.costoMaterial = redondeado;
-
-              const horasTotales = this.obtenerHorasTotales();
-              const parcial = (horasTotales * alquilerHora) + (redondeado * 1.2);
-              this.producto.precio = +(parcial * 1.24).toFixed(3);
-            }
-          }
-        });
-    } else {
-      this.producto.costoMaterial = 0;
-      this.producto.precio = 0;
-    }
+calcularCostoYPrecio() {
+  if (!this.producto?.idMaterial) {
+    this.producto.costoMaterial = 0;
+    this.producto.precio = 0;
+    this.producto.costoSublimacion = 0;
+    return;
   }
+
+  const material = this.materiales.find(m => m.IdMaterial === this.producto.idMaterial);
+  if (!material) {
+    this.producto.costoMaterial = 0;
+    this.producto.precio = 0;
+    this.producto.costoSublimacion = 0;
+    return;
+  }
+
+  const maquina = this.maquinas.find(m => m.IdTipoMaquina === material.IdTipoMaquina);
+  const codigoMaquina = maquina?.CodigoMaquina;
+
+  if (codigoMaquina === 'FDA' || codigoMaquina === 'SDA') {
+    // Filamento y Resina
+    this.http.get<any>(`${this.apiUrl}/parametros-costo/buscar/material/${material.IdMaterial}`)
+      .subscribe({
+        next: (res) => {
+          if (res.data && res.data.length > 0) {
+            const r = res.data[0];
+            const costoPorGr = r.CostoPorGr ?? 0;
+            const alquilerHora = r.AlquilerHora ?? 0;
+
+            const calculado = this.producto.cantidadMaterial * costoPorGr;
+            const redondeado = Math.round(calculado * 1000) / 1000;
+            this.producto.costoMaterial = redondeado;
+
+            const horasTotales = this.obtenerHorasTotales();
+            const parcial = (horasTotales * alquilerHora) + (redondeado * 1.2);
+            this.producto.precio = +(parcial * 1.24).toFixed(3);
+          }
+        }
+      });
+
+  } else if (codigoMaquina === 'LAS') {
+    // Láser
+    this.http.get<any>(`${this.apiUrl}/parametros-costo/buscar/material/${material.IdMaterial}`)
+      .subscribe({
+        next: (res) => {
+          if (res.data && res.data.length > 0) {
+            const r = res.data[0];
+            const costoPorM2 = r.CostoPorM2 ?? 0;
+            const alquilerHora = r.AlquilerHora ?? 0;
+
+            const ancho = this.producto.ancho ?? 0;
+            const alto = this.producto.altura ?? 0;
+            const areaCm2 = ancho * alto;
+
+            const calculado = (areaCm2 * costoPorM2) / 10000;
+            const redondeado = Math.round(calculado * 1000) / 1000;
+            this.producto.costoMaterial = redondeado;
+
+            const horasTotales = this.obtenerHorasTotales();
+            const parcial = (horasTotales * alquilerHora) + (redondeado * 1.2);
+            this.producto.precio = +(parcial * 1.24).toFixed(3);
+          }
+        }
+      });
+
+  } else if (codigoMaquina === 'SUB') {
+    // Sublimadora
+    this.http.get<any>(`${this.apiUrl}/parametros-costo/buscar/material/${material.IdMaterial}`)
+      .subscribe({
+        next: (res) => {
+          if (res.data && res.data.length > 0) {
+            const r = res.data[0];
+            const costoFijo = r.CostoFijo ?? 0;
+            const costoUsoA4 = r.CostoUsoA4 ?? 0;
+
+            // Costo fijo directo
+            this.producto.costoMaterial = costoFijo;
+
+            // Cálculo costo sublimación
+            const largo = this.producto.altura ?? 0;
+            const ancho = this.producto.ancho ?? 0;
+            const areaCm2 = largo * ancho;
+
+            const baseAreaCm2 = 623.7; // Ajuste final
+            const calculado = (costoUsoA4 * areaCm2) / baseAreaCm2;
+            const redondeado = Math.round(calculado * 1000) / 1000;
+
+            this.producto.costoSublimacion = redondeado;
+
+            // Precio: suma de ambos costos
+            this.producto.precio = +(redondeado + costoFijo).toFixed(3);
+          }
+        }
+      });
+
+  } else {
+    this.producto.costoMaterial = 0;
+    this.producto.precio = 0;
+    this.producto.costoSublimacion = 0;
+  }
+}
 
   private obtenerHorasTotales(): number {
     let horasTotales = 0;
